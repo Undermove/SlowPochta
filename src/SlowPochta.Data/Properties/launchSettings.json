@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SlowPochta.Data": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "INSTALL_SERVER_CONNECTION_STRING": "Host=127.0.0.1;Port=5432;Database=slowpochta;Username=postgres;Password=postgress"
+      }
+    }
+  }
+}

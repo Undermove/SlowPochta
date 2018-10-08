@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>JWT в ASP.NET Core Web API</title>
+</head>
+<body>
+    <div class="userInfo" style="display:none;">
+        <p>Вы вошли как: <span class="userName"></span></p>
+        <input type="button" value="Выйти" id="logOut" />
+    </div>
+    <div class="loginForm">
+        <h3>Вход на сайт</h3>
+        <label>Введите email</label><br />
+        <input type="email" id="emailLogin" /> <br /><br />
+        <label>Введите пароль</label><br />
+        <input type="password" id="passwordLogin" /><br /><br />
+        <input type="submit" id="submitLogin" value="Логин" />
+    </div>
+    <div>
+        <input type="submit" id="getDataByLogin" value="Данные по логину" />
+    </div>
+    <div>
+        <input type="submit" id="getDataByRole" value="Данные по роли" />
+    </div>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script>
+        var tokenKey = "accessToken";
+        $('#submitLogin').click(function (e) {
+            e.preventDefault();
+            var loginData = {
+                grant_type: 'password',
+                username: $('#emailLogin').val(),
+                password: $('#passwordLogin').val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/token',
+                data: loginData
+            }).success(function (data) {
+                $('.userName').text(data.username);
+                $('.userInfo').css('display', 'block');
+                $('.loginForm').css('display', 'none');
+                // сохраняем в хранилище sessionStorage токен доступа
+                sessionStorage.setItem(tokenKey, data.access_token);
+                console.log(data.access_token);
+            }).fail(function (data) {
+                console.log(data);
+            });
+        });
+
+        $('#logOut').click(function (e) {
+            e.preventDefault();
+            $('.loginForm').css('display', 'block');
+            $('.userInfo').css('display', 'none');
+            sessionStorage.removeItem(tokenKey);
+        });
+
+        $('#getDataByLogin').click(function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: '/api/values/getlogin',
+                beforeSend: function (xhr) {
+
+                    var token = sessionStorage.getItem(tokenKey);
+                    xhr.setRequestHeader("Authorization", "Bearer " + token);
+                },
+                success: function (data) {
+                    alert(data);
+                },
+                fail: function (data) {
+                    console.log(data);
+                }
+            });
+        });
+        $('#getDataByRole').click(function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: '/api/values/getrole',
+                beforeSend: function (xhr) {
+
+                    var token = sessionStorage.getItem(tokenKey);
+                    xhr.setRequestHeader("Authorization", "Bearer " + token);
+                },
+                success: function (data) {
+                    alert(data);
+                },
+                fail: function (data) {
+                    console.log(data);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
