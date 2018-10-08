@@ -37,7 +37,6 @@ namespace SlowPochta.Api
 
 			services.AddSingleton<DesignTimeDbContextFactory>();
 			services.AddSingleton<AccountModule>();
-			services.AddSingleton<ConnectionStringProvider>();
 
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options =>

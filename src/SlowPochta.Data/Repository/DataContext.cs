@@ -6,13 +6,12 @@ namespace SlowPochta.Data.Repository
 {
 	public class DataContext : DbContext
 	{
-		public string ConnectionString { get; set; }
-
 		public DbSet<Person> Persons { get; set; }
 
-		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+		public DataContext(DbContextOptions<DataContext> options)
+			: base(options)
 		{
-			optionsBuilder.UseNpgsql(ConnectionString);
+
 		}
 	}
 }
