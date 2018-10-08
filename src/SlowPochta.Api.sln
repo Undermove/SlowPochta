@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlowPochta.Api", "SlowPochta.Api\SlowPochta.Api.csproj", "{7CF74DDB-B15E-4A12-80E5-6987FB2B4F06}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4 Api", "4 Api", "{F9A7C7BE-6237-43A9-8EB2-7889EDFBE2E0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 Core", "1 Core", "{EC125F39-D10F-4CBA-A613-C8D8A4FAFF8B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 Data", "2 Data", "{1887F274-1AB9-4C36-86BB-D17743B97AE9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 Business", "3 Business", "{378477AA-7837-425A-8EF5-DBCE88A2C79F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5 Test", "5 Test", "{2572325C-9537-4127-BBC2-AE301BD51609}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6 Utils", "6 Utils", "{238415CC-7931-421C-9D80-98A47F9FF1C3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlowPochta.Data", "SlowPochta.Data\SlowPochta.Data.csproj", "{AFC31AEA-180F-453B-9B72-64C8EC11C4E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlowPochta.Business.Module", "SlowPochta.Business.Module\SlowPochta.Business.Module.csproj", "{F74ED7A4-EE1D-4AF8-B54E-F822CDAE1ACB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7CF74DDB-B15E-4A12-80E5-6987FB2B4F06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CF74DDB-B15E-4A12-80E5-6987FB2B4F06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CF74DDB-B15E-4A12-80E5-6987FB2B4F06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CF74DDB-B15E-4A12-80E5-6987FB2B4F06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFC31AEA-180F-453B-9B72-64C8EC11C4E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFC31AEA-180F-453B-9B72-64C8EC11C4E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFC31AEA-180F-453B-9B72-64C8EC11C4E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFC31AEA-180F-453B-9B72-64C8EC11C4E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F74ED7A4-EE1D-4AF8-B54E-F822CDAE1ACB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F74ED7A4-EE1D-4AF8-B54E-F822CDAE1ACB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F74ED7A4-EE1D-4AF8-B54E-F822CDAE1ACB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F74ED7A4-EE1D-4AF8-B54E-F822CDAE1ACB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7CF74DDB-B15E-4A12-80E5-6987FB2B4F06} = {F9A7C7BE-6237-43A9-8EB2-7889EDFBE2E0}
+		{AFC31AEA-180F-453B-9B72-64C8EC11C4E7} = {1887F274-1AB9-4C36-86BB-D17743B97AE9}
+		{F74ED7A4-EE1D-4AF8-B54E-F822CDAE1ACB} = {378477AA-7837-425A-8EF5-DBCE88A2C79F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F94D6287-F8FB-48E9-9F8E-872D513A8529}
+	EndGlobalSection
+EndGlobal
