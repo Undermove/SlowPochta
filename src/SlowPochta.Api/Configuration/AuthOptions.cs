@@ -20,7 +20,7 @@ namespace SlowPochta.Api.Configuration
 			Issuer = configuration[$"{AuthSection}:Issuer"];
 			Audience = configuration[$"{AuthSection}:Audience"];
 			Key = configuration[$"{AuthSection}:Key"];
-			LifetimeMinutes = Convert.ToInt32(configuration[$"{AuthSection}:Lifetime"]);
+			LifetimeMinutes = Convert.ToInt32(configuration[$"{AuthSection}:LifetimeMinutes"]);
 		}
 
 		private SymmetricSecurityKey GetSymmetricSecurityKey(string key)

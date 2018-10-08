@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.IO;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
 namespace SlowPochta.Data.Repository
 {
@@ -7,12 +9,18 @@ namespace SlowPochta.Data.Repository
 	{
 		public DataContext CreateDbContext(string[] args)
 		{
-			var dbContext = new DataContext
-			{
-				ConnectionString = args[0]
-			};
+			IConfigurationRoot configuration = new ConfigurationBuilder()
+				.SetBasePath(Directory.GetCurrentDirectory())
+				.AddJsonFile("appsettings.json")
+				.Build();
 
-			return dbContext;
+			var builder = new DbContextOptionsBuilder<DataContext>();
+
+			var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+			builder.UseNpgsql(connectionString);
+
+			return new DataContext(builder.Options);
 		}
 	}
 }
