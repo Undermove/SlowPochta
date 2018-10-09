@@ -8,22 +8,22 @@ using Xunit;
 
 namespace SlowPochta.Tests
 {
-	public class AccountModuleTests : IDisposable
+	public class AuthModuleTests : IDisposable
 	{
-		private readonly AccountModule _accountModule;
+		private readonly AuthModule _authModule;
 		private readonly DataContext _dataContext;
 
-		public AccountModuleTests()
+		public AuthModuleTests()
 		{
 			var contextFactory = new DesignTimeDbContextFactory();
 			_dataContext = contextFactory.CreateDbContext(new string[]{});
 			_dataContext.Database.Migrate();
-			_accountModule = new AccountModule(contextFactory);
+			_authModule = new AuthModule(contextFactory);
 		}
 
 		public void Dispose()
 		{
-			_accountModule.Dispose();
+			_authModule.Dispose();
 			_dataContext.Database.EnsureDeleted();
 			_dataContext.Dispose();
 		}
@@ -32,18 +32,18 @@ namespace SlowPochta.Tests
 		public void GetIdentitySuccessTest()
 		{
 			// arrange
-			Person testPerson = new Person()
+			User testUser = new User()
 			{
 				Login = "test",
 				Password = "test",
-				Role = "admin"
+				Role = RoleTypes.User
 			};
 
-			_dataContext.Persons.Add(testPerson);
+			_dataContext.Users.Add(testUser);
 			_dataContext.SaveChanges();
 
 			// act
-			ClaimsIdentity claims = _accountModule.GetIdentity(testPerson.Login, testPerson.Password);
+			ClaimsIdentity claims = _authModule.GetIdentity(testUser.Login, testUser.Password);
 
 			// assert
 			Assert.NotNull(claims);
@@ -53,17 +53,17 @@ namespace SlowPochta.Tests
 		public void GetIdentityFailTest()
 		{
 			// arrange
-			Person testPerson = new Person()
+			User testUser = new User()
 			{
 				Login = "test",
 				Password = "test",
-				Role = "admin"
+				Role = RoleTypes.User
 			};
 
-			_dataContext.Persons.Add(testPerson);
+			_dataContext.Users.Add(testUser);
 
 			// act
-			ClaimsIdentity claims = _accountModule.GetIdentity("wrong login", "wrong password");
+			ClaimsIdentity claims = _authModule.GetIdentity("wrong login", "wrong password");
 
 			// assert
 			Assert.Null(claims);

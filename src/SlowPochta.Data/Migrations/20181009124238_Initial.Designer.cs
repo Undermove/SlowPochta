@@ -9,8 +9,8 @@ using SlowPochta.Data.Repository;
 namespace SlowPochta.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20181003145841_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20181009124238_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,7 +20,7 @@ namespace SlowPochta.Data.Migrations
                 .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            modelBuilder.Entity("SlowPochta.Data.Model.Person", b =>
+            modelBuilder.Entity("SlowPochta.Data.Model.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -29,11 +29,11 @@ namespace SlowPochta.Data.Migrations
 
                     b.Property<string>("Password");
 
-                    b.Property<string>("Role");
+                    b.Property<int>("Role");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Persons");
+                    b.ToTable("Users");
                 });
 #pragma warning restore 612, 618
         }

@@ -10,16 +10,16 @@ using SlowPochta.Business.Module;
 
 namespace SlowPochta.Api.Controllers
 {
-	public class AccountController : Controller
+	public class AuthController : Controller
 	{
-		private readonly AccountModule _accountModule;
+		private readonly AuthModule _authModule;
 		private readonly AuthOptions _authOptions;
 
-		public AccountController(
-			AccountModule accountModule,
+		public AuthController(
+			AuthModule authModule,
 			AuthOptions authOptions)
 		{
-			_accountModule = accountModule;
+			_authModule = authModule;
 			_authOptions = authOptions;
 		}
 
@@ -29,7 +29,7 @@ namespace SlowPochta.Api.Controllers
 			var username = Request.Form["username"];
 			var password = Request.Form["password"];
 
-			var identity = _accountModule.GetIdentity(username, password);
+			var identity = _authModule.GetIdentity(username, password);
 			if (identity == null)
 			{
 				Response.StatusCode = 400;
