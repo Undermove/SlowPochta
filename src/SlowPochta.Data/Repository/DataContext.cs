@@ -7,6 +7,7 @@ namespace SlowPochta.Data.Repository
 	public class DataContext : DbContext
 	{
 		public DbSet<User> Users { get; set; }
+		public DbSet<MessageToUser> MessagesToUsers { get; set; }
 
 		public DataContext(DbContextOptions<DataContext> options)
 			: base(options)
