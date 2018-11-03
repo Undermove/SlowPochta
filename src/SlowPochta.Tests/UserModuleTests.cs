@@ -73,5 +73,16 @@ namespace SlowPochta.Tests
                                                        user.Password == testUser.Password));
             Assert.Equal(1, _dataContext.Users.Count());
         }
+
+        [Fact]
+        public async void CreateNullUserTest()
+        {
+            // act
+            bool result = await _usersModule.TryRegisterAsync(null);
+
+            // assert
+            Assert.False(result);
+            Assert.Equal(0, _dataContext.Users.Count());
+        }
     }
 }
