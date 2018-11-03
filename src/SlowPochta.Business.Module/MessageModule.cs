@@ -26,6 +26,11 @@ namespace SlowPochta.Business.Module
 
 		public async Task<bool> CreateMessage(MessageContract messageContract)
 		{
+		    if (messageContract == null)
+		    {
+		        return false;
+		    }
+
 			// check that sender presents in database
 			var fromUser = await GetUserFromDb(messageContract.FromUser);
 			if (fromUser == null)
