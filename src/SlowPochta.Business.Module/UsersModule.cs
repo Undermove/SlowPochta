@@ -23,6 +23,11 @@ namespace SlowPochta.Business.Module
 
 		public async Task<bool> TryRegisterAsync(PersonContract personContract)
 		{
+		    if (personContract == null)
+		    {
+		        return false;
+		    }
+
             if (await _dataContext.Users.AnyAsync(person => person.Login.Equals(personContract.Login)))
             {
                 return false;
