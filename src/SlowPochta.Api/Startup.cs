@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using SlowPochta.Api.Configuration;
 using SlowPochta.Business.Module;
+using SlowPochta.Business.Module.Modules;
 using SlowPochta.Data;
 using SlowPochta.Data.Repository;
 

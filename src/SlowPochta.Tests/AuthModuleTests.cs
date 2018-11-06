@@ -2,6 +2,7 @@ using System;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using SlowPochta.Business.Module;
+using SlowPochta.Business.Module.Modules;
 using SlowPochta.Data.Model;
 using SlowPochta.Data.Repository;
 using Xunit;

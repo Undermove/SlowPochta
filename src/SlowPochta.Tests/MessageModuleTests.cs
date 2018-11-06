@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SlowPochta.Business.Module;
 using SlowPochta.Business.Module.DataContracts;
+using SlowPochta.Business.Module.Modules;
 using SlowPochta.Data.Model;
 using SlowPochta.Data.Repository;
 using Xunit;
@@ -313,8 +314,5 @@ namespace SlowPochta.Tests
             Assert.NotNull(result);
             Assert.Empty(result);
         }
-
-        //todo Create a test for the user without messages - DONE
-        // todo Create test for the user without messages with 'delivered' status - DONE
     }
 }

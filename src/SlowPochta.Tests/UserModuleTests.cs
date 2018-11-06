@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SlowPochta.Business.Module;
 using SlowPochta.Business.Module.DataContracts;
+using SlowPochta.Business.Module.Modules;
 using SlowPochta.Data.Model;
 using SlowPochta.Data.Repository;
 using Xunit;
