@@ -40,7 +40,7 @@ namespace SlowPochta.Tests
             {
                 FromUser = "sender",
                 ToUser = "recipient",
-                MessageText = "textMessage"                   
+                MessageText = "textMessage"
             };
 
             User sender = _dataContext.Users.Add(new User()
@@ -194,5 +194,127 @@ namespace SlowPochta.Tests
             Assert.Equal(0, _dataContext.MessagesFromUsers.Count());
             Assert.Equal(0, _dataContext.MessagesToUsers.Count());
         }
+
+        [Fact]
+        public async void GetDeliveredMessagesToUserSuccessTest()
+        {
+            // arrange
+            User toUser = _dataContext.Users.Add(new User()
+            {
+                Login = "recipient",
+            }).Entity;
+
+            Message message = _dataContext.Messages.Add(new Message()
+            {
+                Status = DeliveryStatus.Delivered,
+                MessageText = "msgText",
+            }).Entity;
+
+            _dataContext.SaveChanges();
+
+            _dataContext.MessagesToUsers.Add(new MessageToUser()
+            {
+                MessageId = message.Id,
+                UserId = toUser.Id
+            });
+
+            _dataContext.SaveChanges();
+
+            // act
+            List<Message> result = await _messageModule.GetDeliveredMessagesToUser(toUser.Login);
+
+            // assert
+            Assert.NotNull(result);
+            Assert.Single(result);
+            Assert.Equal(message.MessageText, result[0].MessageText);
+        }
+
+        [Fact]
+        public async void GetDeliveredMessagesForUnknownUserTest()
+        {
+            // arrange
+            User toUser = _dataContext.Users.Add(new User()
+            {
+                Login = "recipient",
+            }).Entity;
+
+            Message message = _dataContext.Messages.Add(new Message()
+            {
+                Status = DeliveryStatus.Delivered,
+                MessageText = "msgText",
+            }).Entity;
+
+            _dataContext.SaveChanges();
+
+            _dataContext.MessagesToUsers.Add(new MessageToUser()
+            {
+                MessageId = message.Id,
+                UserId = toUser.Id
+            });
+
+            _dataContext.SaveChanges();
+
+            // act
+            List<Message> result = await _messageModule.GetDeliveredMessagesToUser("UnknownUser");
+
+            // assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async void GetDeliveredMessagesForTheUserWithoutMessagessTest()
+        {
+            // arrange
+            User toUser = _dataContext.Users.Add(new User()
+            {
+                Login = "recipient",
+            }).Entity;
+
+            _dataContext.SaveChanges();
+
+            // act
+            List<Message> result = await _messageModule.GetDeliveredMessagesToUser(toUser.Login);
+
+            // assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async void GetDeliveredMessagesForTheUserWithoutDeliveredStatusedMessagessTest()
+        {
+            // arrange
+            User toUser = _dataContext.Users.Add(new User()
+            {
+                Login = "recipient",
+            }).Entity;
+
+            Message message = _dataContext.Messages.Add(new Message()
+            {
+                Status = DeliveryStatus.Created,
+                MessageText = "msgText",
+            }).Entity;
+
+            _dataContext.SaveChanges();
+
+            _dataContext.MessagesToUsers.Add(new MessageToUser()
+            {
+                MessageId = message.Id,
+                UserId = toUser.Id
+            });
+
+            _dataContext.SaveChanges();
+
+            // act
+            List<Message> result = await _messageModule.GetDeliveredMessagesToUser(toUser.Login);
+
+            // assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+
+        //todo Create a test for the user without messages - DONE
+        // todo Create test for the user without messages with 'delivered' status - DONE
     }
 }
