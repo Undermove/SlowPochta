@@ -18,24 +18,13 @@ namespace SlowPochta.Business.Module
 		private readonly MessageModule _messageModule;
 		private readonly MessageStatusUpdaterConfig _config;
 
-		private readonly Dictionary<int, Message> _messageCache;
-
 		public MessageStatusUpdater(DesignTimeDbContextFactory context, MessageModule messageModule, MessageStatusUpdaterConfig config)
 		{
 			_messageModule = messageModule;
-			_config = config;
-			_dataContext = context.CreateDbContext(new string[] { });
-			_messageCache = _dataContext.Messages.ToDictionary(message => message.Id, message => message);
-			_scheduler = StdSchedulerFactory.GetDefaultScheduler().Result;
-
-			foreach (var message in _messageCache.Values)
-			{
-				CreateJob(message);
-			}
-
-			_scheduler.Start();
-
 			_messageModule.MessageCreated += OnMessageCreated;
+			_config = config;
+			_scheduler = StdSchedulerFactory.GetDefaultScheduler().Result;
+			_dataContext = context.CreateDbContext(new string[] { });
 		}
 
 		public void Dispose()
@@ -44,6 +33,17 @@ namespace SlowPochta.Business.Module
 
 			_dataContext?.Dispose();
 			_messageModule?.Dispose();
+		}
+
+		public void StartService()
+		{
+			var messages = _dataContext.Messages.ToDictionary(message => message.Id, message => message);
+			foreach (var message in messages.Values)
+			{
+				CreateJob(message);
+			}
+
+			_scheduler.Start();
 		}
 
 		private void OnMessageCreated(object sender, Message message)
@@ -86,6 +86,12 @@ namespace SlowPochta.Business.Module
 				DataContext dataContext = (DataContext)data.Get("dataContext");
 				string jobId = (string)data.Get("jobId");
 
+				if (message.Status == DeliveryStatus.Delivered)
+				{
+					await scheduler.DeleteJob(new JobKey(jobId));
+					return;
+				}
+
 				message.StatusDescription = GetRandomStatus();
 				if (message.StatusDescription == "Доставлено")
 				{
@@ -102,10 +108,12 @@ namespace SlowPochta.Business.Module
 				List<string> randomDescriptions = new List<string>()
 				{
 					"В Екатеринбурге, на распределительном пункте",
-					"На проверке у людей одетыми в пикачу-кигуруми",
+					"Проходит таможню",
 					"На теплоходе, плывущем в Австралию",
 					"Текущее местоположение не известно. Возможно мы его потеряли, но даже в этом мы не уверены. Мы делаем все возможное для исправления этой ситуации. Спасибо что остаетесь с нами, немотря на отвратительное качество услуг.",
 					"Уважаемый пользователь вынуждены сообщить вам что в связи с недавним сбоем в наших серверах отключение света в серверной по независящим от нас причинам мы возвращаем все письма на первый пункт сортировки поэтому время доставки будет слегка увеличено у нас так не хватает времени что мы не можем даже раставить знаки препинания в данном предложение а если бы и было то мы бы не стали.",
+					"В Сингапуре",
+					"Едет в Тулу на перекладных",
 					"Доставлено"
 				};
 

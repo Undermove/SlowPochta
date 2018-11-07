@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SlowPochta.Business.Module;
 using SlowPochta.Business.Module.DataContracts;
 using SlowPochta.Business.Module.Modules;
 

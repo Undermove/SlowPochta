@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using SlowPochta.Api.Configuration;
 using SlowPochta.Business.Module;
+using SlowPochta.Business.Module.Configuration;
 using SlowPochta.Business.Module.Modules;
 using SlowPochta.Data;
 using SlowPochta.Data.Repository;
@@ -40,6 +41,8 @@ namespace SlowPochta.Api
 			services.AddSingleton<AuthModule>();
 			services.AddSingleton<MessageModule>();
 			services.AddSingleton<UsersModule>();
+			services.AddSingleton<MessageStatusUpdater>();
+			services.AddSingleton<MessageStatusUpdaterConfig>();
 
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options =>
@@ -87,6 +90,9 @@ namespace SlowPochta.Api
 			app.UseAuthentication();
 			app.UseHttpsRedirection();
 			app.UseMvc();
+
+			var msu = app.ApplicationServices.GetService<MessageStatusUpdater>();
+			msu.StartService();
 		}
 	}
 }

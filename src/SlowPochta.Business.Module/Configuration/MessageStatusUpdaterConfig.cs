@@ -11,7 +11,8 @@ namespace SlowPochta.Business.Module.Configuration
 
 		public MessageStatusUpdaterConfig(IConfigurationRoot configuration)
 		{
-			UpdateIntervalMinutes = Int32.Parse(configuration[MessageStatusUpdaterSection] + ":" + nameof(UpdateIntervalMinutes));
+			string key = MessageStatusUpdaterSection + ":" + nameof(UpdateIntervalMinutes);
+			UpdateIntervalMinutes = Int32.Parse(configuration[key]);
 		}
 	}
 }

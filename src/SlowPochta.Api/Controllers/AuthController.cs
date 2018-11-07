@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SlowPochta.Api.Configuration;
-using SlowPochta.Business.Module;
 using SlowPochta.Business.Module.Modules;
 
 namespace SlowPochta.Api.Controllers
