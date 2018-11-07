@@ -314,5 +314,83 @@ namespace SlowPochta.Tests
             Assert.NotNull(result);
             Assert.Empty(result);
         }
+        
+            [Fact]
+        public async void GetMessagesFromUserSuccessTest()
+        {
+            // arrange
+            User fromUser = _dataContext.Users.Add(new User()
+            {
+                Login = "sender",
+            }).Entity;
+
+            Message message = _dataContext.Messages.Add(new Message()).Entity;
+
+            _dataContext.SaveChanges();
+
+            _dataContext.MessagesFromUsers.Add(new MessageFromUser()
+            {
+                MessageId = message.Id,
+                UserId = fromUser.Id
+            });
+
+            _dataContext.SaveChanges();
+
+            // act
+            List<Message> result = await _messageModule.GetMessagesFromUser(fromUser.Login);
+
+            // assert
+            Assert.NotNull(result);
+            Assert.Single(result);
+            //Assert.Equal(message.MessageText, result[0].MessageText);
+        }
+
+        [Fact]
+        public async void TryGetMessagesFromUserWithoutMessagessTest()
+        {
+            // arrange
+            User fromUser = _dataContext.Users.Add(new User()
+            {
+                Login = "sender",
+            }).Entity;
+
+            _dataContext.SaveChanges();
+
+            // act
+            List<Message> result = await _messageModule.GetMessagesFromUser(fromUser.Login);
+
+            // assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async void GetMessagesFromUnknownUserTest()
+        {
+            // arrange
+            User fromUser = _dataContext.Users.Add(new User()
+            {
+                Login = "sender",
+            }).Entity;
+
+            Message message = _dataContext.Messages.Add(new Message()).Entity;
+
+            _dataContext.SaveChanges();
+
+            _dataContext.MessagesToUsers.Add(new MessageToUser()
+            {
+                MessageId = message.Id,
+                UserId = fromUser.Id
+            });
+
+            _dataContext.SaveChanges();
+
+            // act
+            List<Message> result = await _messageModule.GetMessagesFromUser("UnknownUser");
+
+            // assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
     }
 }
