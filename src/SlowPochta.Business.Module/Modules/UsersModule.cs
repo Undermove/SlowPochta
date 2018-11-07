@@ -5,7 +5,7 @@ using SlowPochta.Business.Module.DataContracts;
 using SlowPochta.Data.Model;
 using SlowPochta.Data.Repository;
 
-namespace SlowPochta.Business.Module
+namespace SlowPochta.Business.Module.Modules
 {
 	public class UsersModule : IDisposable
 	{

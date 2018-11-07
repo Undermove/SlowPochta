@@ -8,7 +8,7 @@ using SlowPochta.Business.Module.DataContracts;
 using SlowPochta.Data.Model;
 using SlowPochta.Data.Repository;
 
-namespace SlowPochta.Business.Module
+namespace SlowPochta.Business.Module.Modules
 {
 	public class MessageModule : IDisposable
 	{
@@ -23,6 +23,8 @@ namespace SlowPochta.Business.Module
 		{
 			_dataContext?.Dispose();
 		}
+
+		public event EventHandler<Message> MessageCreated;
 
 		public async Task<bool> CreateMessage(MessageContract messageContract)
 		{
@@ -70,6 +72,8 @@ namespace SlowPochta.Business.Module
 			});
 
 			await _dataContext.SaveChangesAsync();
+
+			MessageCreated?.Invoke(this, newMessage.Entity);
 
 			return true;
 		}

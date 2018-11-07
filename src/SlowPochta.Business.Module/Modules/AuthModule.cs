@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using SlowPochta.Data;
 using SlowPochta.Data.Model;
 using SlowPochta.Data.Repository;
 
-namespace SlowPochta.Business.Module
+namespace SlowPochta.Business.Module.Modules
 {
 	public class AuthModule : IDisposable
 	{
