@@ -1,23 +1,52 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SlowPochta.Business.Module.DataContracts;
+using SlowPochta.Business.Module.Modules;
+using SlowPochta.Data.Model;
 
 namespace SlowPochta.Api.Controllers
 {
     [Route("api/[controller]")]
     public class MessageController : Controller
     {
-        [Authorize]
+	    private readonly MessageModule _messageModule;
+
+	    public MessageController(MessageModule messageModule)
+	    {
+		    _messageModule = messageModule;
+	    }
+
+	    [Authorize]
+		[HttpGet]
         [Route("getdeliveredmessages")]
-        public IActionResult GetDeliveredMessages()
-        {
-            return Ok();
+        public async Task<IActionResult> GetDeliveredMessages()
+	    {
+		    string currentUserLogin = User.Identity.Name;
+
+			List<Message> messages = await _messageModule.GetDeliveredMessagesToUser(currentUserLogin);
+
+	        return Json(messages);
         }
 
         [Authorize(Roles = "test")]
-        [Route("createmessage")]
-        public IActionResult CreateMessage()
+		[HttpPut]
+        public IActionResult CreateMessage([FromBody] MessageContract messageContract)
         {
-            return Ok();
+			// нужно дописать код метода
+
+			return Ok();
         }
-    }
+
+	    [Authorize(Roles = "test")]
+	    [HttpGet]
+        [Route("getsendedmessages")]
+		public IActionResult GetSendedMessages()
+	    {
+		    // нужно дописать код метода
+
+		    return Ok();
+	    }
+	}
 }
