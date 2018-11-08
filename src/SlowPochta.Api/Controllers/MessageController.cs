@@ -32,21 +32,23 @@ namespace SlowPochta.Api.Controllers
 
         [Authorize(Roles = "test")]
 		[HttpPut]
-        public IActionResult CreateMessage([FromBody] MessageContract messageContract)
+        public async Task<IActionResult> CreateMessage([FromBody] MessageContract messageContract)
         {
-			// нужно дописать код метода
+            bool message = await _messageModule.CreateMessage(messageContract);
 
-			return Ok();
+            return Json(message);
         }
 
 	    [Authorize(Roles = "test")]
 	    [HttpGet]
         [Route("getsendedmessages")]
-		public IActionResult GetSendedMessages()
+		public async Task<IActionResult> GetSendedMessages()
 	    {
-		    // нужно дописать код метода
+	        string currentUserLogin = User.Identity.Name;
 
-		    return Ok();
-	    }
+	        List<Message> messages = await _messageModule.GetMessagesFromUser(currentUserLogin);
+
+	        return Json(messages);
+        }
 	}
 }
