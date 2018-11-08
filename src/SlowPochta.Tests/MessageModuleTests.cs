@@ -342,7 +342,7 @@ namespace SlowPochta.Tests
             // assert
             Assert.NotNull(result);
             Assert.Single(result);
-            //Assert.Equal(message.MessageText, result[0].MessageText);
+            Assert.Equal(message.MessageText, result[0].MessageText);
         }
 
         [Fact]
