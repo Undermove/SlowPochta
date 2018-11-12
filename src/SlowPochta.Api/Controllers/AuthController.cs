@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SlowPochta.Api.Configuration;
+using SlowPochta.Business.Module.DataContracts;
 using SlowPochta.Business.Module.Modules;
 
 namespace SlowPochta.Api.Controllers
@@ -24,10 +25,10 @@ namespace SlowPochta.Api.Controllers
 		}
 
 		[HttpPost("/token")]
-		public async Task Token()
+		public async Task Token([FromBody]PersonContract personContract)
 		{
-			var username = Request.Form["username"];
-			var password = Request.Form["password"];
+			var username = personContract.Login;
+			var password = personContract.Password;
 
 			var identity = _authModule.GetIdentity(username, password);
 			if (identity == null)

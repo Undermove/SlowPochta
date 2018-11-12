@@ -70,6 +70,7 @@ namespace SlowPochta.Api
 				});
 
 			services.AddMvc();
+			services.AddCors();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -83,6 +84,11 @@ namespace SlowPochta.Api
 			{
 				app.UseHsts();
 			}
+
+			app.UseCors(builder =>
+			{
+				builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().Build();
+			});
 
 			app.UseDefaultFiles();
 			app.UseStaticFiles();
