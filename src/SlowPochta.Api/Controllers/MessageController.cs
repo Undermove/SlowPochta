@@ -30,8 +30,8 @@ namespace SlowPochta.Api.Controllers
 	        return Json(messages);
         }
 
-        [Authorize(Roles = "test")]
-		[HttpPut]
+        [Authorize]
+		[HttpPost]
         public async Task<IActionResult> CreateMessage([FromBody] MessageContract messageContract)
         {
             bool message = await _messageModule.CreateMessage(messageContract);
