@@ -130,6 +130,34 @@ namespace SlowPochta.Business.Module.Modules
 	        return messages;
 	    }
 
+	    public async Task<List<Message>> GetMessageById(int id)
+	    {
+	        // check that messageId presents in database
+            var msgId = await GetMessageFromDb(id);
+	        if (msgId == null)
+	        {
+                return new List<Message>();
+	        }
+
+	        // find all messages IDs 
+            List<int> listMessagesIds = await _dataContext.Messages
+	            .Where(message => message.Id == msgId.Id)
+	            .Select(message => message.Id)
+	            .ToListAsync();
+
+	        // select all messages fromUser
+            var selectedMessages = await _dataContext.Messages
+	            .Where(aMessage => listMessagesIds.Contains(aMessage.Id))
+	            .ToListAsync();
+
+	        return selectedMessages;
+	    }
+
+	    private async Task<Message> GetMessageFromDb(int idNumber)
+	    {
+	        return await _dataContext.Messages.FirstOrDefaultAsync(id => id.Id.Equals(idNumber));
+	    }
+
         private async Task<User> GetUserFromDb(string login)
 		{
 			return await _dataContext.Users.FirstOrDefaultAsync(person => person.Login.Equals(login));
