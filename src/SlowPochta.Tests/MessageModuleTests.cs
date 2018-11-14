@@ -402,30 +402,30 @@ namespace SlowPochta.Tests
             _dataContext.SaveChanges();
 
             // act
-            List<Message> result = await _messageModule.GetMessageById(message.Id);
+            Message result = await _messageModule.GetMessageById(message.Id);
 
             // assert
-            Assert.NotNull(result);
-            Assert.Single(result);           
+            Assert.NotNull(result);  
+            Assert.Equal(1, result.Id);
         }
 
         [Fact]
         public async void TryGetMessageByWithWrongId()
         {
             // arrange
-            Message message = _dataContext.Messages.Add(new Message()
+            _dataContext.Messages.Add(new Message()
             {
                 Id = 123,
-            }).Entity;
+            });
 
             _dataContext.SaveChanges();
 
             // act
-            List<Message> result = await _messageModule.GetMessageById(6);
+            Message result = await _messageModule.GetMessageById(6);
 
             // assert
-            Assert.NotNull(result);
-            Assert.Empty(result);
+            Assert.NotNull(result);    
+            Assert.Equal(0, result.Id);
         }
     }
 }
