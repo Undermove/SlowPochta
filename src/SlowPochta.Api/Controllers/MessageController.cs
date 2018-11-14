@@ -39,7 +39,7 @@ namespace SlowPochta.Api.Controllers
             return Json(message);
         }
 
-	    [Authorize(Roles = "test")]
+	    [Authorize]
 	    [HttpGet]
         [Route("getsendedmessages")]
 		public async Task<IActionResult> GetSendedMessages()

@@ -68,8 +68,7 @@ namespace SlowPochta.Business.Module
 
 			ITrigger trigger = TriggerBuilder.Create()
 				.WithIdentity(id, "group")
-				.StartNow()
-				.WithSimpleSchedule(builder => builder.WithIntervalInMinutes(_config.UpdateIntervalMinutes))
+				.WithSimpleSchedule(builder => builder.WithIntervalInMinutes(_config.UpdateIntervalMinutes).RepeatForever())
 				.Build();
 
 			_scheduler.ScheduleJob(job, trigger);
