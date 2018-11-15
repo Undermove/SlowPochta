@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -23,7 +22,11 @@ namespace SlowPochta.Tests
             var contextFactory = new DesignTimeDbContextFactory();
             _dataContext = contextFactory.CreateDbContext(new string[] { });
             _dataContext.Database.Migrate();
-            Mock<MessageStatusUpdaterConfig> configurationMock = new Mock<MessageStatusUpdaterConfig>();
+
+            Mock<IConfigurationRoot> mock = new Mock<IConfigurationRoot>();
+            mock.Setup(root => root[It.IsAny<string>()]).Returns("1");
+
+            Mock<MessageStatusUpdaterConfig> configurationMock = new Mock<MessageStatusUpdaterConfig>(mock.Object);
             configurationMock.Setup(config => config.UpdateIntervalMinutes).Returns(1);
 
             _messageStatusUpdater = new MessageStatusUpdater(
@@ -39,18 +42,20 @@ namespace SlowPochta.Tests
             _dataContext.Dispose();
         }
 
-
         [Fact]
-        public void Test()
+        public void MessageStatusDescriptionUpdatingTest()
         {
             //arrange
             _dataContext.Messages.Add(new Message());
             _dataContext.SaveChanges();
 
             //act
-
+            _messageStatusUpdater.StartService();
+            Thread.Sleep(1000);
 
             //assert
+            var msg = _dataContext.Messages.Find(1);
+            Assert.False(string.IsNullOrEmpty(msg.StatusDescription));
         }
     }
 }
