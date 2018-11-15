@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Quartz;
 using Quartz.Impl;
+using Quartz.Impl.Triggers;
 using SlowPochta.Business.Module.Configuration;
 using SlowPochta.Business.Module.Modules;
 using SlowPochta.Data.Model;
@@ -37,8 +38,8 @@ namespace SlowPochta.Business.Module
 
 		public void StartService()
 		{
-			var messages = _dataContext.Messages.ToDictionary(message => message.Id, message => message);
-			foreach (var message in messages.Values)
+			var messages = _dataContext.Messages.ToList();
+			foreach (var message in messages)
 			{
 				CreateJob(message);
 			}
