@@ -34,9 +34,12 @@ namespace SlowPochta.Api.Controllers
 		[HttpPost]
         public async Task<IActionResult> CreateMessage([FromBody] MessageContract messageContract)
         {
-            bool message = await _messageModule.CreateMessage(messageContract);
+            if (await _messageModule.CreateMessage(messageContract))
+            {
+                return Ok("Message created");
+            }
 
-            return Json(message);
+            return BadRequest("Message was'n created");
         }
 
 	    [Authorize]
