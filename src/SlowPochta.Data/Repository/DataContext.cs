@@ -9,6 +9,7 @@ namespace SlowPochta.Data.Repository
 		public DbSet<MessageToUser> MessagesToUsers { get; set; }
 		public DbSet<MessageFromUser> MessagesFromUsers { get; set; }
 		public DbSet<Message> Messages { get; set; }
+        public DbSet<MessagePassedDeliveryStatus> MessagePassedDeliveryStatuses { get; set; }
 
 		public DataContext(DbContextOptions<DataContext> options)
 			: base(options)
