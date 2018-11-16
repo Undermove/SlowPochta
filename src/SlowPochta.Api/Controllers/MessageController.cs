@@ -50,5 +50,15 @@ namespace SlowPochta.Api.Controllers
 
 	        return Json(messages);
         }
-	}
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Get([FromQuery] int request)
+        {
+            var message = await _messageModule.GetMessageById(request);
+
+            return Json(message);
+        }
+
+    }
 }
