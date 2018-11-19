@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using SlowPochta.Business.Module;
@@ -31,7 +33,7 @@ namespace SlowPochta.Tests
 
             _messageStatusUpdater = new MessageStatusUpdater(
                 contextFactory,
-                new MessageModule(contextFactory), 
+                new MessageModule(contextFactory),
                 configurationMock.Object);
         }
 
@@ -47,15 +49,35 @@ namespace SlowPochta.Tests
         {
             //arrange
             _dataContext.Messages.Add(new Message());
-            _dataContext.SaveChanges();
+            _dataContext.SaveChanges();                                      //todo: fix the test as it is true and not false in the end
 
             //act
             _messageStatusUpdater.StartService();
-            Thread.Sleep(1000);
+            Thread.Sleep(10000);
+            _dataContext.SaveChanges();
 
             //assert
             var msg = _dataContext.Messages.Find(1);
             Assert.False(string.IsNullOrEmpty(msg.StatusDescription));
+        }
+
+        [Fact]
+        public void TryChangeDeliveredStatusDescriptionTest()
+        {
+            //arrange
+            Message testMessage = _dataContext.Messages.Add(new Message()
+            {
+                StatusDescription = "",
+                Status = DeliveryStatus.Delivered,
+            }).Entity;
+            _dataContext.SaveChanges();
+
+            //act
+            _messageStatusUpdater.StartService();
+            Thread.Sleep(5000);
+
+            //assert           
+            Assert.True(testMessage.StatusDescription == "");
         }
     }
 }
