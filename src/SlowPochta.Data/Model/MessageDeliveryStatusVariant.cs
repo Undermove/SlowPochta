@@ -9,6 +9,5 @@ namespace SlowPochta.Data.Model
         public int Id { get; set; }
 
         public string DeliveryStatusDescription { get; set; }
-
     }
 }

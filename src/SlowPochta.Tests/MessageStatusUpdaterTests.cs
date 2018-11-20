@@ -79,5 +79,26 @@ namespace SlowPochta.Tests
             //assert           
             Assert.True(testMessage.StatusDescription == "");
         }
+
+        [Fact]
+        public void TryGetStatusFromDbTest()
+        {
+            //arrange
+            _dataContext.Messages.Add(new Message());
+
+            MessageDeliveryStatusVariant messageDeliveryStatus = _dataContext.MessageDeliveryStatusVariants.Add(
+                new MessageDeliveryStatusVariant()
+                {
+                    DeliveryStatusDescription = " in the Dark Deep Beneath"
+                }).Entity;
+            _dataContext.SaveChanges();
+
+            //act
+            _messageStatusUpdater.StartService();
+            Thread.Sleep(60000);
+
+            //assert           
+            Assert.True(messageDeliveryStatus.DeliveryStatusDescription == " in the Dark Deep Beneath");
+        }
     }
 }
