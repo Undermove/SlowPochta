@@ -29,7 +29,7 @@ namespace SlowPochta.Tests
             mock.Setup(root => root[It.IsAny<string>()]).Returns("1");
 
             Mock<MessageStatusUpdaterConfig> configurationMock = new Mock<MessageStatusUpdaterConfig>(mock.Object);
-            configurationMock.Setup(config => config.UpdateIntervalMinutes).Returns(1);
+            configurationMock.Setup(config => config.UpdateIntervalSeconds).Returns(1);
 
             _messageStatusUpdater = new MessageStatusUpdater(
                 contextFactory,
@@ -49,11 +49,16 @@ namespace SlowPochta.Tests
         {
             //arrange
             _dataContext.Messages.Add(new Message());
+	        _dataContext.MessageDeliveryStatusVariants.Add(
+		        new MessageDeliveryStatusVariant()
+		        {
+			        DeliveryStatusDescription = "Some Delivery status"
+		        });
             _dataContext.SaveChanges();                                      //todo: fix the test as it is true and not false in the end
 
             //act
             _messageStatusUpdater.StartService();
-            Thread.Sleep(10000);
+            Thread.Sleep(5000);
             _dataContext.SaveChanges();
 
             //assert
@@ -95,7 +100,7 @@ namespace SlowPochta.Tests
 
             //act
             _messageStatusUpdater.StartService();
-            Thread.Sleep(60000);
+            Thread.Sleep(5000);
 
             //assert           
             Assert.True(messageDeliveryStatus.DeliveryStatusDescription == " in the Dark Deep Beneath");
