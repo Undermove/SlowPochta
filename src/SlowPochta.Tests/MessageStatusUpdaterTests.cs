@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -54,7 +55,7 @@ namespace SlowPochta.Tests
 		        {
 			        DeliveryStatusDescription = "Some Delivery status"
 		        });
-            _dataContext.SaveChanges();                                      //todo: fix the test as it is true and not false in the end
+            _dataContext.SaveChanges();                                     
 
             //act
             _messageStatusUpdater.StartService();
@@ -64,6 +65,8 @@ namespace SlowPochta.Tests
             //assert
             var msg = _dataContext.Messages.Find(1);
             Assert.False(string.IsNullOrEmpty(msg.StatusDescription));
+            var deliveryStatus = _dataContext.MessagePassedDeliveryStatuses.Find(1);
+            Assert.NotNull(deliveryStatus);
         }
 
         [Fact]
@@ -83,6 +86,8 @@ namespace SlowPochta.Tests
 
             //assert           
             Assert.True(testMessage.StatusDescription == "");
+            var deliveryStatus = _dataContext.MessagePassedDeliveryStatuses.Any();
+            Assert.False(deliveryStatus);
         }
 
         [Fact]

@@ -108,9 +108,13 @@ namespace SlowPochta.Business.Module
                     await scheduler.DeleteJob(new JobKey(jobId));
                 }
 
-				// todo нужно добавить запись в таблицу MessagePassedDeliveryStatus
+                await dataContext.MessagePassedDeliveryStatuses.AddAsync(new MessagePassedDeliveryStatus()
+                {
+                    MessageId = message.Id,
+                    DeliveryStatusVariantId = statusId,
+                });
 
-				dataContext.Messages.Update(message);
+                dataContext.Messages.Update(message);
                 await dataContext.SaveChangesAsync();
             }
 
