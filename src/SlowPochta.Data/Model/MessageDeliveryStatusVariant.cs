@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SlowPochta.Data.Model
+﻿namespace SlowPochta.Data.Model
 {
     public  class MessageDeliveryStatusVariant
     {

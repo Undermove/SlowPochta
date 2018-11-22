@@ -95,18 +95,26 @@ namespace SlowPochta.Business.Module
                     return;
                 }
 
-                message.StatusDescription = GetRandomStatus(dataContext);
+	            if (message.Status == DeliveryStatus.Created)
+	            {
+		            message.Status = DeliveryStatus.InProgress;
+	            }
+
+				int statusId;
+				(statusId, message.StatusDescription) = GetRandomStatus(dataContext);
                 if (message.StatusDescription == "Доставлено")
                 {
                     message.Status = DeliveryStatus.Delivered;
                     await scheduler.DeleteJob(new JobKey(jobId));
                 }
 
-                dataContext.Messages.Update(message);
+				// todo нужно добавить запись в таблицу MessagePassedDeliveryStatus
+
+				dataContext.Messages.Update(message);
                 await dataContext.SaveChangesAsync();
             }
 
-            private string GetRandomStatus(DataContext dContext)
+            private (int, string) GetRandomStatus(DataContext dContext)
             {
                 List<string> randomDescriptions = dContext.MessageDeliveryStatusVariants
                     .Select(variant => variant.DeliveryStatusDescription)
@@ -114,7 +122,7 @@ namespace SlowPochta.Business.Module
 
                 Random rnd = new Random();
                 int randomNum = rnd.Next(0, randomDescriptions.Count);
-                return randomDescriptions[randomNum];
+                return (randomNum, randomDescriptions[randomNum]);
             }
         }
     }
