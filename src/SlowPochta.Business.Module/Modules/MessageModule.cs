@@ -107,13 +107,15 @@ namespace SlowPochta.Business.Module.Modules
 			return messages;
 		}
 
-	    public async Task<List<Message>> GetMessagesFromUser(string userLogin)
+		// Раньше метод выдавал нам сообщения. Теперь он выдает специальный класс,
+		// который содержит чуть больше данных чем класс Message
+		public async Task<List<MessageAnswerContract>> GetMessagesFromUser(string userLogin)
 	    {
 	        // check that sender presents in database
 	        var fromUser = await GetUserFromDb(userLogin);
 	        if (fromUser == null)
 	        {
-	            return new List<Message>();
+	            return new List<MessageAnswerContract>();
 	        }
 
 	        // find all messages IDs fromUser
@@ -122,15 +124,46 @@ namespace SlowPochta.Business.Module.Modules
 	            .Select(messageFromUser => messageFromUser.MessageId)
 	            .ToListAsync();
 
-	        // select all messages fromUser
-	        var messages = await _dataContext.Messages
+			// select all messages fromUser
+			var messages = await _dataContext.Messages
 	            .Where(message => messagesFromUserIds.Contains(message.Id))
 	            .ToListAsync();
 
-	        return messages;
+			var messageAnswers = await ConvertToMessageAnswerContracts(userLogin, messages);
+
+		    return messageAnswers;
 	    }
 
-	    public async Task<Message> GetMessageById(int id)
+		private async Task<List<MessageAnswerContract>> ConvertToMessageAnswerContracts(string userLogin, List<Message> messages)
+		{
+			List<MessageAnswerContract> messageAnswers = new List<MessageAnswerContract>();
+
+			foreach (var message in messages)
+			{
+				var toUsersIds = await _dataContext.MessagesToUsers
+					.Where(mtu => mtu.MessageId == message.Id)
+					.Select(user => user.UserId)
+					.ToListAsync();
+
+				var toUsersLogins = await _dataContext.Users
+					.Where(user => toUsersIds.Contains(user.Id))
+					.Select(user => user.Login).ToListAsync();
+
+				messageAnswers.Add(new MessageAnswerContract()
+				{
+					ToUser = toUsersLogins[0],
+					FromUser = userLogin,
+					StatusDescription = message.StatusDescription,
+					MessageText = message.MessageText,
+					DeliveryDate = message.DeliveryDate,
+					CreationDate = message.CreationDate
+				});
+			}
+
+			return messageAnswers;
+		}
+
+		public async Task<Message> GetMessageById(int id)
 	    {
 	        // check that messageId presents in database
             var msg = await GetMessageFromDb(id);
