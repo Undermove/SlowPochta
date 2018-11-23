@@ -10,6 +10,8 @@ namespace SlowPochta.Data.Model
 
 		public DateTime CreationDate { get; set; }
 
+		public DateTime? DeliveryDate { get; set; }
+
 		public DeliveryStatus Status { get; set; }
 
 		public string StatusDescription { get; set; }

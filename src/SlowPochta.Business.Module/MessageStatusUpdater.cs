@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Quartz.Impl;
-using Quartz.Impl.Triggers;
 using SlowPochta.Business.Module.Configuration;
 using SlowPochta.Business.Module.Modules;
 using SlowPochta.Data.Model;
@@ -19,6 +17,8 @@ namespace SlowPochta.Business.Module
         private readonly DataContext _dataContext;
         private readonly MessageModule _messageModule;
         private readonly MessageStatusUpdaterConfig _config;
+
+	    private const string FinalStatusDescription = "Доставлено";
 
         public MessageStatusUpdater(DesignTimeDbContextFactory context, MessageModule messageModule,
             MessageStatusUpdaterConfig config)
@@ -40,7 +40,7 @@ namespace SlowPochta.Business.Module
 
         public void StartService()
         {
-            var messages = _dataContext.Messages.ToList();
+            var messages = _dataContext.Messages.Where(message => message.Status != DeliveryStatus.Delivered).ToList();
             foreach (var message in messages)
             {
                 CreateJob(message);
@@ -89,21 +89,21 @@ namespace SlowPochta.Business.Module
                 DataContext dataContext = (DataContext) data.Get("dataContext");
                 string jobId = (string) data.Get("jobId");
 
-                if (message.Status == DeliveryStatus.Delivered)
+                switch (message.Status)
                 {
-                    await scheduler.DeleteJob(new JobKey(jobId));
-                    return;
+	                case DeliveryStatus.Delivered:
+		                await scheduler.DeleteJob(new JobKey(jobId));
+		                return;
+	                case DeliveryStatus.Created:
+		                message.Status = DeliveryStatus.InProgress;
+		                break;
                 }
 
-	            if (message.Status == DeliveryStatus.Created)
-	            {
-		            message.Status = DeliveryStatus.InProgress;
-	            }
-
-				int statusId;
+	            int statusId;
 				(statusId, message.StatusDescription) = GetRandomStatus(dataContext);
-                if (message.StatusDescription == "Доставлено")
+                if (message.StatusDescription == FinalStatusDescription)
                 {
+					message.DeliveryDate = DateTime.UtcNow;
                     message.Status = DeliveryStatus.Delivered;
                     await scheduler.DeleteJob(new JobKey(jobId));
                 }
