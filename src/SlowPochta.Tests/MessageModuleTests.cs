@@ -337,7 +337,7 @@ namespace SlowPochta.Tests
             _dataContext.SaveChanges();
 
             // act
-            List<Message> result = await _messageModule.GetMessagesFromUser(fromUser.Login);
+            List<MessageAnswerContract> result = await _messageModule.GetMessagesFromUser(fromUser.Login);
 
             // assert
             Assert.NotNull(result);
@@ -357,7 +357,7 @@ namespace SlowPochta.Tests
             _dataContext.SaveChanges();
 
             // act
-            List<Message> result = await _messageModule.GetMessagesFromUser(fromUser.Login);
+            List<MessageAnswerContract> result = await _messageModule.GetMessagesFromUser(fromUser.Login);
 
             // assert
             Assert.NotNull(result);
@@ -386,7 +386,7 @@ namespace SlowPochta.Tests
             _dataContext.SaveChanges();
 
             // act
-            List<Message> result = await _messageModule.GetMessagesFromUser("UnknownUser");
+            List<MessageAnswerContract> result = await _messageModule.GetMessagesFromUser("UnknownUser");
 
             // assert
             Assert.NotNull(result);

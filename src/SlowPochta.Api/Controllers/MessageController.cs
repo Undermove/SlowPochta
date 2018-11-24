@@ -49,7 +49,7 @@ namespace SlowPochta.Api.Controllers
 	    {
 	        string currentUserLogin = User.Identity.Name;
 
-	        List<Message> messages = await _messageModule.GetMessagesFromUser(currentUserLogin);
+	        List<MessageAnswerContract> messages = await _messageModule.GetMessagesFromUser(currentUserLogin);
 
 	        return Json(messages);
         }
