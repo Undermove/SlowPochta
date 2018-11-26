@@ -154,7 +154,7 @@ namespace SlowPochta.Business.Module.Modules
 
 				messageAnswers.Add(new MessageAnswerContract()
 				{
-					ToUser = toUsersLogins.Aggregate("", (current, element) => current + (element + ", ")),
+					ToUser = toUsersLogins.Aggregate("", (current, element) => current + (element)),
 					FromUser = userLogin,
 					StatusDescription = message.StatusDescription,
 					MessageText = message.MessageText,
@@ -184,7 +184,7 @@ namespace SlowPochta.Business.Module.Modules
 				messageAnswers.Add(new MessageAnswerContract()
 				{
 					ToUser = userLogin,
-					FromUser = fromUsersLogins.Aggregate("", (current, element) => current + (element + ", ")),
+					FromUser = fromUsersLogins.Aggregate("", (current, element) => current + (element)),
 					StatusDescription = message.StatusDescription,
 					MessageText = message.MessageText,
 					DeliveryDate = message.DeliveryDate,
