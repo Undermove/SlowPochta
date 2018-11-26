@@ -10,6 +10,7 @@ using SlowPochta.Data.Repository;
 
 namespace SlowPochta.Business.Module.Modules
 {
+	// свзяь многие ко многим реализована вручную, а не при помощи Entity в учебных целях
 	public class MessageModule : IDisposable
 	{
 		private readonly DataContext _dataContext;
@@ -83,13 +84,13 @@ namespace SlowPochta.Business.Module.Modules
 		/// </summary>
 		/// <param name="userLogin">user that recieved messages</param>
 		/// <returns>List of messages with status delivered</returns>
-		public async Task<List<Message>> GetDeliveredMessagesToUser(string userLogin)
+		public async Task<List<MessageAnswerContract>> GetDeliveredMessagesToUser(string userLogin)
 		{
 			// check that reciever presents in database
 			var toUser = await GetUserFromDb(userLogin);
 			if (toUser == null)
 			{
-				return new List<Message>();
+				return new List<MessageAnswerContract>();
 			}
 
 			// find all messages IDs that sended to user
@@ -104,7 +105,9 @@ namespace SlowPochta.Business.Module.Modules
 				                  message.Status == DeliveryStatus.Delivered)
 				.ToListAsync();
 
-			return messages;
+			var messageAnswers = await ConvertRecievedMessagesToMessageAnswerContracts(userLogin, messages);
+
+			return messageAnswers;
 		}
 
 		// Раньше метод выдавал нам сообщения. Теперь он выдает специальный класс,
@@ -129,12 +132,12 @@ namespace SlowPochta.Business.Module.Modules
 	            .Where(message => messagesFromUserIds.Contains(message.Id))
 	            .ToListAsync();
 
-			var messageAnswers = await ConvertToMessageAnswerContracts(userLogin, messages);
+			var messageAnswers = await ConvertSentMessagesToMessageAnswerContracts(userLogin, messages);
 
 		    return messageAnswers;
 	    }
 
-		private async Task<List<MessageAnswerContract>> ConvertToMessageAnswerContracts(string userLogin, List<Message> messages)
+		private async Task<List<MessageAnswerContract>> ConvertSentMessagesToMessageAnswerContracts(string userLogin, List<Message> messages)
 		{
 			List<MessageAnswerContract> messageAnswers = new List<MessageAnswerContract>();
 
@@ -151,8 +154,37 @@ namespace SlowPochta.Business.Module.Modules
 
 				messageAnswers.Add(new MessageAnswerContract()
 				{
-					ToUser = toUsersLogins[0],
+					ToUser = toUsersLogins.Aggregate("", (current, element) => current + (element + ", ")),
 					FromUser = userLogin,
+					StatusDescription = message.StatusDescription,
+					MessageText = message.MessageText,
+					DeliveryDate = message.DeliveryDate,
+					CreationDate = message.CreationDate
+				});
+			}
+
+			return messageAnswers;
+		}
+
+		private async Task<List<MessageAnswerContract>> ConvertRecievedMessagesToMessageAnswerContracts(string userLogin, List<Message> messages)
+		{
+			List<MessageAnswerContract> messageAnswers = new List<MessageAnswerContract>();
+
+			foreach (var message in messages)
+			{
+				var fromUsersIds = await _dataContext.MessagesFromUsers
+					.Where(mtu => mtu.MessageId == message.Id)
+					.Select(user => user.UserId)
+					.ToListAsync();
+
+				var fromUsersLogins = await _dataContext.Users
+					.Where(user => fromUsersIds.Contains(user.Id))
+					.Select(user => user.Login).ToListAsync();
+
+				messageAnswers.Add(new MessageAnswerContract()
+				{
+					ToUser = userLogin,
+					FromUser = fromUsersLogins.Aggregate("", (current, element) => current + (element + ", ")),
 					StatusDescription = message.StatusDescription,
 					MessageText = message.MessageText,
 					DeliveryDate = message.DeliveryDate,

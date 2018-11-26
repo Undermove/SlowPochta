@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using SlowPochta.Business.Module;
 using SlowPochta.Business.Module.DataContracts;
 using SlowPochta.Business.Module.Modules;
 using SlowPochta.Data.Model;
@@ -222,7 +219,7 @@ namespace SlowPochta.Tests
             _dataContext.SaveChanges();
 
             // act
-            List<Message> result = await _messageModule.GetDeliveredMessagesToUser(toUser.Login);
+            List<MessageAnswerContract> result = await _messageModule.GetDeliveredMessagesToUser(toUser.Login);
 
             // assert
             Assert.NotNull(result);
@@ -256,7 +253,7 @@ namespace SlowPochta.Tests
             _dataContext.SaveChanges();
 
             // act
-            List<Message> result = await _messageModule.GetDeliveredMessagesToUser("UnknownUser");
+            List<MessageAnswerContract> result = await _messageModule.GetDeliveredMessagesToUser("UnknownUser");
 
             // assert
             Assert.NotNull(result);
@@ -275,7 +272,7 @@ namespace SlowPochta.Tests
             _dataContext.SaveChanges();
 
             // act
-            List<Message> result = await _messageModule.GetDeliveredMessagesToUser(toUser.Login);
+            List<MessageAnswerContract> result = await _messageModule.GetDeliveredMessagesToUser(toUser.Login);
 
             // assert
             Assert.NotNull(result);
@@ -308,7 +305,7 @@ namespace SlowPochta.Tests
             _dataContext.SaveChanges();
 
             // act
-            List<Message> result = await _messageModule.GetDeliveredMessagesToUser(toUser.Login);
+            List<MessageAnswerContract> result = await _messageModule.GetDeliveredMessagesToUser(toUser.Login);
 
             // assert
             Assert.NotNull(result);
