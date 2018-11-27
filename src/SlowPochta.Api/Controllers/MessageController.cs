@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SlowPochta.Api.Requests;
 using SlowPochta.Business.Module.DataContracts;
 using SlowPochta.Business.Module.Modules;
-using SlowPochta.Data.Model;
 
 namespace SlowPochta.Api.Controllers
 {
@@ -56,12 +56,17 @@ namespace SlowPochta.Api.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] int request)
+        public async Task<IActionResult> Get([FromQuery] SingleItemRequest request)
         {
-            var message = await _messageModule.GetMessageById(request);
+	        if (request.Id == null)
+	        {
+		        return BadRequest("Request Id is Empty");
+	        }
 
-            return Json(message);
+	        var message = await _messageModule.GetMessageById(request.Id.Value);
+
+	        return Json(message);
+
         }
-
     }
 }

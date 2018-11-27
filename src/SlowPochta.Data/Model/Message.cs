@@ -4,7 +4,7 @@ namespace SlowPochta.Data.Model
 {
 	public class Message
 	{
-		public int Id { get; set; }
+		public long Id { get; set; }
 
 		public string MessageText { get; set; }
 

@@ -2,8 +2,8 @@
 {
     public class MessagePassedDeliveryStatus
     {
-        public int Id { get; set; }
-        public int MessageId { get; set; }
-        public int DeliveryStatusVariantId { get; set; }
+        public long Id { get; set; }
+        public long MessageId { get; set; }
+        public long DeliveryStatusVariantId { get; set; }
     }
 }

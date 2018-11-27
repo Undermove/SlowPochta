@@ -94,7 +94,7 @@ namespace SlowPochta.Business.Module.Modules
 			}
 
 			// find all messages IDs that sended to user
-			List<int> messagesToUserIds = await _dataContext.MessagesToUsers
+			List<long> messagesToUserIds = await _dataContext.MessagesToUsers
 				.Where(messageToUser => messageToUser.UserId == toUser.Id)
 				.Select(messageToUser => messageToUser.MessageId)
 				.ToListAsync();
@@ -122,7 +122,7 @@ namespace SlowPochta.Business.Module.Modules
 	        }
 
 	        // find all messages IDs fromUser
-	        List<int> messagesFromUserIds = await _dataContext.MessagesFromUsers
+	        List<long> messagesFromUserIds = await _dataContext.MessagesFromUsers
 	            .Where(messageFromUser => messageFromUser.UserId == fromUser.Id)
 	            .Select(messageFromUser => messageFromUser.MessageId)
 	            .ToListAsync();
@@ -143,20 +143,17 @@ namespace SlowPochta.Business.Module.Modules
 
 			foreach (var message in messages)
 			{
-				var toUsersIds = await _dataContext.MessagesToUsers
-					.Where(mtu => mtu.MessageId == message.Id)
-					.Select(user => user.UserId)
-					.ToListAsync();
+				var recieverUsersLogins = await GetRecieversUsersLogins(message);
 
-				var toUsersLogins = await _dataContext.Users
-					.Where(user => toUsersIds.Contains(user.Id))
-					.Select(user => user.Login).ToListAsync();
+				var passed = await GetPassedDeliveryStatuses(message);
 
 				messageAnswers.Add(new MessageAnswerContract()
 				{
-					ToUser = toUsersLogins.Aggregate("", (current, element) => current + (element)),
-					FromUser = userLogin,
-					StatusDescription = message.StatusDescription,
+					Id = message.Id,
+					RecieverLogin = recieverUsersLogins.Aggregate("", (current, element) => current + (element)),
+					SenderLogin = userLogin,
+					LastStatusDescription = message.StatusDescription,
+					PassedDeliveryStatuses = passed,
 					MessageText = message.MessageText,
 					DeliveryDate = message.DeliveryDate,
 					CreationDate = message.CreationDate
@@ -164,6 +161,19 @@ namespace SlowPochta.Business.Module.Modules
 			}
 
 			return messageAnswers;
+		}
+
+		private async Task<List<string>> GetRecieversUsersLogins(Message message)
+		{
+			var toUsersIds = await _dataContext.MessagesToUsers
+				.Where(mtu => mtu.MessageId == message.Id)
+				.Select(user => user.UserId)
+				.ToListAsync();
+
+			var toUsersLogins = await _dataContext.Users
+				.Where(user => toUsersIds.Contains(user.Id))
+				.Select(user => user.Login).ToListAsync();
+			return toUsersLogins;
 		}
 
 		private async Task<List<MessageAnswerContract>> ConvertRecievedMessagesToMessageAnswerContracts(string userLogin, List<Message> messages)
@@ -172,20 +182,17 @@ namespace SlowPochta.Business.Module.Modules
 
 			foreach (var message in messages)
 			{
-				var fromUsersIds = await _dataContext.MessagesFromUsers
-					.Where(mtu => mtu.MessageId == message.Id)
-					.Select(user => user.UserId)
-					.ToListAsync();
+				var senderUserLogin = await GetSenderUserLogin(message);
 
-				var fromUsersLogins = await _dataContext.Users
-					.Where(user => fromUsersIds.Contains(user.Id))
-					.Select(user => user.Login).ToListAsync();
+				var passed = await GetPassedDeliveryStatuses(message);
 
 				messageAnswers.Add(new MessageAnswerContract()
 				{
-					ToUser = userLogin,
-					FromUser = fromUsersLogins.Aggregate("", (current, element) => current + (element)),
-					StatusDescription = message.StatusDescription,
+					Id = message.Id,
+					RecieverLogin = userLogin,
+					SenderLogin = senderUserLogin,
+					LastStatusDescription = message.StatusDescription,
+					PassedDeliveryStatuses = passed,
 					MessageText = message.MessageText,
 					DeliveryDate = message.DeliveryDate,
 					CreationDate = message.CreationDate
@@ -195,18 +202,62 @@ namespace SlowPochta.Business.Module.Modules
 			return messageAnswers;
 		}
 
-		public async Task<Message> GetMessageById(int id)
+		private async Task<string> GetSenderUserLogin(Message message)
+		{
+			var fromUsersIds = await _dataContext.MessagesFromUsers
+				.Where(mtu => mtu.MessageId == message.Id)
+				.Select(user => user.UserId)
+				.ToListAsync();
+
+			var fromUsersLogins = await _dataContext.Users
+				.Where(user => fromUsersIds.Contains(user.Id))
+				.Select(user => user.Login).ToListAsync();
+			return fromUsersLogins.FirstOrDefault();
+		}
+
+		private async Task<List<MessageDeliveryStatusVariant>> GetPassedDeliveryStatuses(Message message)
+		{
+			List<MessagePassedDeliveryStatus> passedDeliveryStatuses = await _dataContext.MessagePassedDeliveryStatuses
+				.Where(status => status.MessageId == message.Id).ToListAsync();
+
+			var passed = await _dataContext.MessageDeliveryStatusVariants
+				.Join(
+					passedDeliveryStatuses,
+					variant => variant.Id,
+					status => status.DeliveryStatusVariantId,
+					(variant, status) => variant)
+				.ToListAsync();
+			return passed;
+		}
+
+		public async Task<MessageAnswerContract> GetMessageById(long id)
 	    {
 	        // check that messageId presents in database
             var msg = await GetMessageFromDb(id);
-	        if (msg == null)
+			if (msg == null)
 	        {
-                return new Message();
+                return new MessageAnswerContract();
 	        }
-	        return msg;
+
+		    var passed = await GetPassedDeliveryStatuses(msg);
+		    var reciever = await GetRecieversUsersLogins(msg);
+		    var sender = await GetSenderUserLogin(msg);
+			var msgContract = new MessageAnswerContract()
+			{
+				Id = msg.Id,
+				PassedDeliveryStatuses = passed,
+				CreationDate = msg.CreationDate,
+				LastStatusDescription = msg.StatusDescription,
+				DeliveryDate = msg.DeliveryDate,
+				MessageText = msg.MessageText,
+				RecieverLogin = reciever.FirstOrDefault(),
+				SenderLogin = sender,
+			};
+
+			return msgContract;
 	    }
 
-	    private async Task<Message> GetMessageFromDb(int idNumber)
+	    private async Task<Message> GetMessageFromDb(long idNumber)
 	    {
 	        return await _dataContext.Messages.FirstOrDefaultAsync(id => id.Id.Equals(idNumber));
 	    }

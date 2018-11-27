@@ -1,9 +1,15 @@
-﻿namespace SlowPochta.Data.Model
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SlowPochta.Data.Model
 {
     public  class MessageDeliveryStatusVariant
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
 
-        public string DeliveryStatusDescription { get; set; }
+		[MaxLength(256)]
+	    public string DeliveryStatusHeader { get; set; }
+
+	    [MaxLength(2000)]
+		public string DeliveryStatusDescription { get; set; }
     }
 }

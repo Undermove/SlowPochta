@@ -101,31 +101,38 @@ namespace SlowPochta.Business.Module
 
 	            int statusId;
 				(statusId, message.StatusDescription) = GetRandomStatus(dataContext);
-                if (message.StatusDescription == FinalStatusDescription)
+	            statusId++;
+				if (message.StatusDescription == FinalStatusDescription)
                 {
 					message.DeliveryDate = DateTime.UtcNow;
                     message.Status = DeliveryStatus.Delivered;
-                    await scheduler.DeleteJob(new JobKey(jobId));
-                }
+					await scheduler.DeleteJob(new JobKey(jobId));
+					await AddPassedDeliveryStatus(dataContext, message, statusId);
+				}
 
-                await dataContext.MessagePassedDeliveryStatuses.AddAsync(new MessagePassedDeliveryStatus()
-                {
-                    MessageId = message.Id,
-                    DeliveryStatusVariantId = statusId,
-                });
-
-                dataContext.Messages.Update(message);
-                await dataContext.SaveChangesAsync();
+				await AddPassedDeliveryStatus(dataContext, message, statusId);
             }
 
-            private (int, string) GetRandomStatus(DataContext dContext)
+	        private static async Task AddPassedDeliveryStatus(DataContext dataContext, Message message, int statusId)
+	        {
+		        await dataContext.MessagePassedDeliveryStatuses.AddAsync(new MessagePassedDeliveryStatus()
+		        {
+			        MessageId = message.Id,
+			        DeliveryStatusVariantId = statusId,
+		        });
+
+		        dataContext.Messages.Update(message);
+		        await dataContext.SaveChangesAsync();
+			}
+
+	        private (int, string) GetRandomStatus(DataContext dContext)
             {
                 List<string> randomDescriptions = dContext.MessageDeliveryStatusVariants
-                    .Select(variant => variant.DeliveryStatusDescription)
+                    .Select(variant => variant.DeliveryStatusHeader)
                     .ToList();
 
                 Random rnd = new Random();
-                int randomNum = rnd.Next(0, randomDescriptions.Count);
+                int randomNum = rnd.Next(1, randomDescriptions.Count);
                 return (randomNum, randomDescriptions[randomNum]);
             }
         }

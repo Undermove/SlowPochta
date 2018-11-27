@@ -2,10 +2,10 @@
 {
 	public class MessageToUser
 	{
-		public int Id { get; set; }
+		public long Id { get; set; }
 
-		public int MessageId { get; set; }
+		public long MessageId { get; set; }
 
-		public int UserId { get; set; }
+		public long UserId { get; set; }
 	}
 }

@@ -398,8 +398,8 @@ namespace SlowPochta.Tests
 
             _dataContext.SaveChanges();
 
-            // act
-            Message result = await _messageModule.GetMessageById(message.Id);
+			// act
+	        MessageAnswerContract result = await _messageModule.GetMessageById(message.Id);
 
             // assert
             Assert.NotNull(result);  
@@ -417,8 +417,8 @@ namespace SlowPochta.Tests
 
             _dataContext.SaveChanges();
 
-            // act
-            Message result = await _messageModule.GetMessageById(6);
+			// act
+	        MessageAnswerContract result = await _messageModule.GetMessageById(6);
 
             // assert
             Assert.NotNull(result);    
