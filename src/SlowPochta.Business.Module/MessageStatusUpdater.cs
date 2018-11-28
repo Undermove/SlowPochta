@@ -101,6 +101,8 @@ namespace SlowPochta.Business.Module
 
 	            int statusId;
 				(statusId, message.StatusDescription) = GetRandomStatus(dataContext);
+				// todo заменить этот костыль чем-то нормальным. Сделан так как statusId выдается не из базы,
+				// а это просто рандомное число
 	            statusId++;
 				if (message.StatusDescription == FinalStatusDescription)
                 {
