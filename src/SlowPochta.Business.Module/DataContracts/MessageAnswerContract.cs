@@ -16,7 +16,7 @@ namespace SlowPochta.Business.Module.DataContracts
 
 		public string LastStatusDescription { get; set; }
 
-		public List<MessageDeliveryStatusVariant> PassedDeliveryStatuses { get; set; }
+		public List<MessageDeliveryStatusContract> PassedDeliveryStatuses { get; set; }
 
 		public DateTime CreationDate { get; set; }
 

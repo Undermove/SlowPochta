@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace SlowPochta.Data.Model
 {
-    public  class MessageDeliveryStatusVariant
+    public class MessageDeliveryStatusVariant
     {
         public long Id { get; set; }
 

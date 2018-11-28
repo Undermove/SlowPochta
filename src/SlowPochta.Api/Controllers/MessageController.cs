@@ -58,7 +58,7 @@ namespace SlowPochta.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] SingleItemRequest request)
         {
-	        if (request.Id == null)
+			if (request.Id == null)
 	        {
 		        return BadRequest("Request Id is Empty");
 	        }
@@ -66,7 +66,6 @@ namespace SlowPochta.Api.Controllers
 	        var message = await _messageModule.GetMessageById(request.Id.Value);
 
 	        return Json(message);
-
         }
     }
 }

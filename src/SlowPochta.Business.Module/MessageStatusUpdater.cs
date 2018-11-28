@@ -107,7 +107,6 @@ namespace SlowPochta.Business.Module
 					message.DeliveryDate = DateTime.UtcNow;
                     message.Status = DeliveryStatus.Delivered;
 					await scheduler.DeleteJob(new JobKey(jobId));
-					await AddPassedDeliveryStatus(dataContext, message, statusId);
 				}
 
 				await AddPassedDeliveryStatus(dataContext, message, statusId);
@@ -119,6 +118,7 @@ namespace SlowPochta.Business.Module
 		        {
 			        MessageId = message.Id,
 			        DeliveryStatusVariantId = statusId,
+					TransitionDateTime = DateTime.UtcNow
 		        });
 
 		        dataContext.Messages.Update(message);

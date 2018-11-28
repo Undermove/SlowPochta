@@ -147,6 +147,7 @@ namespace SlowPochta.Business.Module.Modules
 
 				var passed = await GetPassedDeliveryStatuses(message);
 
+				// todo Сделать нормальные конструкторы для MAC
 				messageAnswers.Add(new MessageAnswerContract()
 				{
 					Id = message.Id,
@@ -215,17 +216,18 @@ namespace SlowPochta.Business.Module.Modules
 			return fromUsersLogins.FirstOrDefault();
 		}
 
-		private async Task<List<MessageDeliveryStatusVariant>> GetPassedDeliveryStatuses(Message message)
+		private async Task<List<MessageDeliveryStatusContract>> GetPassedDeliveryStatuses(Message message)
 		{
 			List<MessagePassedDeliveryStatus> passedDeliveryStatuses = await _dataContext.MessagePassedDeliveryStatuses
 				.Where(status => status.MessageId == message.Id).ToListAsync();
 
-			var passed = await _dataContext.MessageDeliveryStatusVariants
+			List<MessageDeliveryStatusContract> passed = await _dataContext.MessageDeliveryStatusVariants
 				.Join(
 					passedDeliveryStatuses,
 					variant => variant.Id,
 					status => status.DeliveryStatusVariantId,
-					(variant, status) => variant)
+					(variant, status) => new MessageDeliveryStatusContract(variant, status) )
+				.OrderBy(contract => contract.TransitionDateTime)
 				.ToListAsync();
 			return passed;
 		}
