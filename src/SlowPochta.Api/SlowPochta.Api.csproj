@@ -12,4 +12,10 @@
     <ProjectReference Include="..\SlowPochta.Business.Module\SlowPochta.Business.Module.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="hosting.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
