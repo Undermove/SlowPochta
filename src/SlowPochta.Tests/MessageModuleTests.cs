@@ -343,6 +343,105 @@ namespace SlowPochta.Tests
         }
 
         [Fact]
+        public async void GetTheMessagesFromTheUserTest()
+        {
+            // arrange
+            User fromUser = _dataContext.Users.Add(new User()
+            {
+                Login = "Sender",
+            }).Entity;
+
+            _dataContext.SaveChanges();
+
+            User toUser = _dataContext.Users.Add(new User()
+            {
+                Login = "Reciever",
+            }).Entity;
+
+            _dataContext.SaveChanges();
+
+            Message message = _dataContext.Messages.Add(new Message()).Entity;
+
+            _dataContext.SaveChanges();
+
+            _dataContext.MessagesFromUsers.Add(new MessageFromUser()
+            {
+                MessageId = message.Id,
+                UserId = fromUser.Id
+            });
+
+            _dataContext.SaveChanges();
+
+            _dataContext.MessagesToUsers.Add(new MessageToUser()
+            {
+                MessageId = message.Id,
+                UserId = toUser.Id
+            });
+
+            _dataContext.SaveChanges();
+
+            // act
+            List<MessageAnswerContract> result = await _messageModule.GetMessagesFromUser(fromUser.Login);
+
+            // assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result);
+            Assert.Equal("Sender", result[0].FromUser);
+        }
+
+
+        [Fact]
+        public async void GetTheDeliveredMessagesToTheUserTest()
+        {
+            // arrange
+            User fromUser = _dataContext.Users.Add(new User()
+            {
+                Login = "Sender",
+            }).Entity;
+
+            _dataContext.SaveChanges();
+
+            User toUser = _dataContext.Users.Add(new User()
+            {
+                Login = "Reciever",
+            }).Entity;
+
+            _dataContext.SaveChanges();
+
+            Message message = _dataContext.Messages.Add(new Message()
+            {
+                Status = DeliveryStatus.Delivered,
+            }).Entity;
+
+            _dataContext.SaveChanges();
+
+            _dataContext.MessagesFromUsers.Add(new MessageFromUser()
+            {
+                MessageId = message.Id,
+                UserId = fromUser.Id
+            });
+
+            _dataContext.SaveChanges();
+
+            _dataContext.MessagesToUsers.Add(new MessageToUser()
+            {
+                MessageId = message.Id,
+                UserId = toUser.Id
+            });
+
+            _dataContext.SaveChanges();
+
+            // act
+            List<MessageAnswerContract> result = await _messageModule.GetDeliveredMessagesToUser(toUser.Login);
+
+            // assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result);
+            Assert.Equal("Reciever", result[0].ToUser);
+        }
+
+
+        [Fact]
         public async void TryGetMessagesFromUserWithoutMessagessTest()
         {
             // arrange
