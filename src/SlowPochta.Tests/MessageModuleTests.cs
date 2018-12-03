@@ -386,7 +386,7 @@ namespace SlowPochta.Tests
             // assert
             Assert.NotNull(result);
             Assert.NotEmpty(result);
-            Assert.Equal("Sender", result[0].FromUser);
+            Assert.Equal(fromUser.Login, result[0].FromUser);
         }
 
 
@@ -437,7 +437,7 @@ namespace SlowPochta.Tests
             // assert
             Assert.NotNull(result);
             Assert.NotEmpty(result);
-            Assert.Equal("Reciever", result[0].ToUser);
+            Assert.Equal(toUser.Login, result[0].ToUser);
         }
 
 
