@@ -241,9 +241,12 @@ namespace SlowPochta.Business.Module.Modules
                 return new MessageAnswerContract();
 	        }
 
-		    var passed = await GetPassedDeliveryStatuses(msg);
 		    var reciever = await GetRecieversUsersLogins(msg);
 		    var sender = await GetSenderUserLogin(msg);
+
+			// todo здесь сделать проверку что reciever или sender совпадают с requesterName
+
+			var passed = await GetPassedDeliveryStatuses(msg);
 			var msgContract = new MessageAnswerContract()
 			{
 				Id = msg.Id,

@@ -63,7 +63,7 @@ namespace SlowPochta.Api.Controllers
 		        return BadRequest("Request Id is Empty");
 	        }
 
-	        var message = await _messageModule.GetMessageById(request.Id.Value);
+			var message = await _messageModule.GetMessageById(request.Id.Value);
 
 	        return Json(message);
         }
