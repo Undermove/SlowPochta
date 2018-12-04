@@ -1,5 +1,8 @@
 ﻿namespace SlowPochta.Data.Model
 {
+    /// <summary>
+    /// Таблица, в которой указаны получатели
+    /// </summary>
 	public class MessageToUser
 	{
 		public long Id { get; set; }

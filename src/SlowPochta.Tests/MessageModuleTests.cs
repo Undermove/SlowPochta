@@ -386,7 +386,7 @@ namespace SlowPochta.Tests
             // assert
             Assert.NotNull(result);
             Assert.NotEmpty(result);
-            Assert.Equal(fromUser.Login, result[0].FromUser);
+            Assert.Equal(fromUser.Login, result[0].SenderLogin);
         }
 
 
@@ -437,7 +437,7 @@ namespace SlowPochta.Tests
             // assert
             Assert.NotNull(result);
             Assert.NotEmpty(result);
-            Assert.Equal(toUser.Login, result[0].ToUser);
+            Assert.Equal(toUser.Login, result[0].RecieverLogin);
         }
 
 
@@ -490,19 +490,82 @@ namespace SlowPochta.Tests
         }
 
         [Fact]
-        public async void GetMessageByIdSuccessTest()
+        public async void GetMessageByIdForRecieverSuccessTest()
         {
             // arrange
            Message message = _dataContext.Messages.Add(new Message()).Entity;
+           User testUser = _dataContext.Users.Add(new User()
+           {
+               Login = "test",
+           }).Entity;
+
+
+            _dataContext.SaveChanges();
+
+            _dataContext.MessagesToUsers.Add(new MessageToUser()
+            {
+                MessageId = message.Id,
+                UserId = testUser.Id
+            });
 
             _dataContext.SaveChanges();
 
 			// act
-	        MessageAnswerContract result = await _messageModule.GetMessageById(message.Id);
+	        MessageAnswerContract result = await _messageModule.GetMessageById(message.Id, testUser.Login);
 
             // assert
             Assert.NotNull(result);  
             Assert.Equal(1, result.Id);
+        }
+
+        [Fact]
+        public async void GetMessageByIdForSenderSuccessTest()
+        {
+            // arrange
+            Message message = _dataContext.Messages.Add(new Message()).Entity;
+            User testUser = _dataContext.Users.Add(new User()
+            {
+                Login = "test",
+            }).Entity;
+
+
+            _dataContext.SaveChanges();
+
+            _dataContext.MessagesFromUsers.Add(new MessageFromUser()
+            {
+                MessageId = message.Id,
+                UserId = testUser.Id
+            });
+
+            _dataContext.SaveChanges();
+
+            // act
+            MessageAnswerContract result = await _messageModule.GetMessageById(message.Id, testUser.Login);
+
+            // assert
+            Assert.NotNull(result);
+            Assert.Equal(1, result.Id);
+        }
+
+        [Fact]
+        public async void GetMessageByIdForRandomUserSuccessTest()
+        {
+            // arrange
+            Message message = _dataContext.Messages.Add(new Message()).Entity;
+            User testUser = _dataContext.Users.Add(new User()
+            {
+                Login = "test",
+            }).Entity;
+
+
+            _dataContext.SaveChanges();
+
+            // act
+            MessageAnswerContract result = await _messageModule.GetMessageById(message.Id, testUser.Login);
+
+            // assert
+            Assert.NotNull(result);
+            Assert.Equal(0, result.Id);
         }
 
         [Fact]
@@ -514,10 +577,12 @@ namespace SlowPochta.Tests
                 Id = 123,
             });
 
+            User testUser = _dataContext.Users.Add(new User()).Entity;
+
             _dataContext.SaveChanges();
 
 			// act
-	        MessageAnswerContract result = await _messageModule.GetMessageById(6);
+	        MessageAnswerContract result = await _messageModule.GetMessageById(6, testUser.Login);
 
             // assert
             Assert.NotNull(result);    
