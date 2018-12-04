@@ -28,7 +28,7 @@ namespace SlowPochta.Api
 				.UseKestrel()
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.UseConfiguration(config)
-				.UseIISIntegration()
+				.UseKestrel()
 				.UseStartup<Startup>()
 				.Build();
 		}

@@ -79,12 +79,17 @@ namespace SlowPochta.Business.Module.Modules
 			return true;
 		}
 
-		/// <summary>
-		/// Method returns all messages that has been delivered to user
-		/// </summary>
-		/// <param name="userLogin">user that recieved messages</param>
-		/// <returns>List of messages with status delivered</returns>
-		public async Task<List<MessageAnswerContract>> GetDeliveredMessagesToUser(string userLogin)
+        public Task GetMessageById(long value)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Method returns all messages that has been delivered to user
+        /// </summary>
+        /// <param name="userLogin">user that recieved messages</param>
+        /// <returns>List of messages with status delivered</returns>
+        public async Task<List<MessageAnswerContract>> GetDeliveredMessagesToUser(string userLogin)
 		{
 			// check that reciever presents in database
 			var toUser = await GetUserFromDb(userLogin);
@@ -232,8 +237,8 @@ namespace SlowPochta.Business.Module.Modules
 			return passed;
 		}
 
-		public async Task<MessageAnswerContract> GetMessageById(long id)
-	    {
+	    public async Task<MessageAnswerContract> GetMessageById(long id, string requesterName)
+        {
 	        // check that messageId presents in database
             var msg = await GetMessageFromDb(id);
 			if (msg == null)
@@ -244,7 +249,10 @@ namespace SlowPochta.Business.Module.Modules
 		    var reciever = await GetRecieversUsersLogins(msg);
 		    var sender = await GetSenderUserLogin(msg);
 
-			// todo здесь сделать проверку что reciever или sender совпадают с requesterName
+            if (sender != requesterName && !reciever.Contains(requesterName))
+            {
+                return new MessageAnswerContract();
+            }
 
 			var passed = await GetPassedDeliveryStatuses(msg);
 			var msgContract = new MessageAnswerContract()
