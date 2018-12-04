@@ -10,6 +10,7 @@ using SlowPochta.Api.Configuration;
 using SlowPochta.Business.Module;
 using SlowPochta.Business.Module.Configuration;
 using SlowPochta.Business.Module.Modules;
+using SlowPochta.Core;
 using SlowPochta.Data;
 using SlowPochta.Data.Repository;
 
@@ -17,6 +18,7 @@ namespace SlowPochta.Api
 {
 	public class Startup
 	{
+		private ServiceProvider _containerProvider;
 		private readonly AuthOptions _authOptions;
 		private readonly IConfigurationRoot _configuration;
 
@@ -71,6 +73,18 @@ namespace SlowPochta.Api
 
 			services.AddMvc();
 			services.AddCors();
+
+			_containerProvider = services.BuildServiceProvider();
+			Start();
+		}
+
+		public void Start()
+		{
+			var loggerFactory = _containerProvider.GetService<ILoggerFactory>();
+			ApplicationLogging.LoggerFactory = loggerFactory;
+
+			var msu = _containerProvider.GetService<MessageStatusUpdater>();
+			msu.StartService();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -96,9 +110,6 @@ namespace SlowPochta.Api
 			app.UseAuthentication();
 			app.UseHttpsRedirection();
 			app.UseMvc();
-
-			var msu = app.ApplicationServices.GetService<MessageStatusUpdater>();
-			msu.StartService();
 		}
 	}
 }

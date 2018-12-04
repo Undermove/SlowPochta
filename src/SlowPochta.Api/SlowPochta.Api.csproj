@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SlowPochta.Business.Module\SlowPochta.Business.Module.csproj" />
+    <ProjectReference Include="..\SlowPochta.Core\SlowPochta.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

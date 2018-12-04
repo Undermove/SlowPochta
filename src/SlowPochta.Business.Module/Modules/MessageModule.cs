@@ -79,11 +79,6 @@ namespace SlowPochta.Business.Module.Modules
 			return true;
 		}
 
-        public Task GetMessageById(long value)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// Method returns all messages that has been delivered to user
         /// </summary>
