@@ -13,7 +13,7 @@ namespace SlowPochta.Api.Controllers
     [Route("api/[controller]")]
     public class MessageController : Controller
     {
-        private static readonly ILogger Logger = ApplicationLogging.CreateLogger<AuthController>();
+        private static readonly ILogger Logger = ApplicationLogging.CreateLogger<MessageController>();
 
         private readonly MessageModule _messageModule;
 
