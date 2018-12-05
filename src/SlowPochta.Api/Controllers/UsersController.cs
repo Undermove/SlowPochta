@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SlowPochta.Business.Module.DataContracts;
 using SlowPochta.Business.Module.Modules;
+using SlowPochta.Core;
+using Microsoft.Extensions.Logging;
 
 namespace SlowPochta.Api.Controllers
 {
@@ -9,7 +11,8 @@ namespace SlowPochta.Api.Controllers
 	[ApiController]
 	public class UsersController : Controller
 	{
-		private readonly UsersModule _usersModule;
+	    private static readonly ILogger Logger = ApplicationLogging.CreateLogger<UsersController>();
+        private readonly UsersModule _usersModule;
 
 		public UsersController(UsersModule usersModule)
 		{
@@ -21,10 +24,11 @@ namespace SlowPochta.Api.Controllers
 		{
 			if (await _usersModule.TryRegisterAsync(personContract))
 			{
-				return Ok("Accepted");
+			    Logger.LogInformation($"The user {personContract.Login} is registered");
+                return Ok("Accepted");
 			}
-
-			return BadRequest("Not registred");
+		    Logger.LogInformation($"The user {personContract.Login} is not registered");
+            return BadRequest("Not registred");
 		}
 	}
 }
