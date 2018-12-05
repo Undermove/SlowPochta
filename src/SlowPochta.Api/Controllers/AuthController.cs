@@ -15,9 +15,9 @@ namespace SlowPochta.Api.Controllers
 {
 	public class AuthController : Controller
 	{
-		private static readonly ILogger Logger = ApplicationLogging.CreateLogger<AuthController>();
+	    private static readonly ILogger Logger = ApplicationLogging.CreateLogger<AuthController>();
 
-		private readonly AuthModule _authModule;
+        private readonly AuthModule _authModule;
 		private readonly AuthOptions _authOptions;
 
 		public AuthController(
