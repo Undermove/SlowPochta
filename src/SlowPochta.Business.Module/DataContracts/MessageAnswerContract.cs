@@ -6,6 +6,24 @@ namespace SlowPochta.Business.Module.DataContracts
 {
 	public class MessageAnswerContract
 	{
+		public MessageAnswerContract(){}
+
+		public MessageAnswerContract(
+			Message msg, 
+			List<MessageDeliveryStatusContract> passedStatuses,
+			string recieverLogin,
+			string senderLogin)
+		{
+			Id = msg.Id;
+			SenderLogin = senderLogin;
+			RecieverLogin = recieverLogin;
+			MessageText = msg.MessageText;
+			LastStatusDescription = msg.StatusDescription;
+			PassedDeliveryStatuses = passedStatuses;
+			CreationDate = msg.CreationDate;
+			DeliveryDate = msg.DeliveryDate;
+		}
+
 		public long Id { get; set; }
 
 		public string SenderLogin { get; set; }
