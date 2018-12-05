@@ -11,8 +11,8 @@ using SlowPochta.Business.Module;
 using SlowPochta.Business.Module.Configuration;
 using SlowPochta.Business.Module.Modules;
 using SlowPochta.Core;
-using SlowPochta.Data;
 using SlowPochta.Data.Repository;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace SlowPochta.Api
 {
@@ -70,6 +70,10 @@ namespace SlowPochta.Api
 						ValidateIssuerSigningKey = true,
 					};
 				});
+			services.AddSwaggerGen(c =>
+			{
+				c.SwaggerDoc("v0", new Info { Title = "SlowPochta API", Version = "v0.0.0" });
+			});
 
 			services.AddMvc();
 			services.AddCors();
@@ -102,6 +106,16 @@ namespace SlowPochta.Api
 			app.UseCors(builder =>
 			{
 				builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().Build();
+			});
+
+			// Enable middleware to serve generated Swagger as a JSON endpoint.
+			app.UseSwagger();
+
+			// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
+			// specifying the Swagger JSON endpoint.
+			app.UseSwaggerUI(c =>
+			{
+				c.SwaggerEndpoint("/swagger/v0/swagger.json", "SlowPochta API V0");
 			});
 
 			app.UseDefaultFiles();
