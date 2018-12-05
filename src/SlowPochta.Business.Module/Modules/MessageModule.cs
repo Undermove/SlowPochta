@@ -148,17 +148,11 @@ namespace SlowPochta.Business.Module.Modules
 				var passed = await GetPassedDeliveryStatuses(message);
 
 				// todo Сделать нормальные конструкторы для MAC
-				messageAnswers.Add(new MessageAnswerContract()
-				{
-					Id = message.Id,
-					RecieverLogin = recieverUsersLogins.Aggregate("", (current, element) => current + (element)),
-					SenderLogin = userLogin,
-					LastStatusDescription = message.StatusDescription,
-					PassedDeliveryStatuses = passed,
-					MessageText = message.MessageText,
-					DeliveryDate = message.DeliveryDate,
-					CreationDate = message.CreationDate
-				});
+				messageAnswers.Add(new MessageAnswerContract(
+					message,
+					passed,
+					recieverUsersLogins.Aggregate("", (current, element) => current + (element)),
+					userLogin));
 			}
 
 			return messageAnswers;
@@ -187,17 +181,7 @@ namespace SlowPochta.Business.Module.Modules
 
 				var passed = await GetPassedDeliveryStatuses(message);
 
-				messageAnswers.Add(new MessageAnswerContract()
-				{
-					Id = message.Id,
-					RecieverLogin = userLogin,
-					SenderLogin = senderUserLogin,
-					LastStatusDescription = message.StatusDescription,
-					PassedDeliveryStatuses = passed,
-					MessageText = message.MessageText,
-					DeliveryDate = message.DeliveryDate,
-					CreationDate = message.CreationDate
-				});
+				messageAnswers.Add(new MessageAnswerContract(message, passed, userLogin, senderUserLogin));
 			}
 
 			return messageAnswers;
@@ -250,17 +234,8 @@ namespace SlowPochta.Business.Module.Modules
             }
 
 			var passed = await GetPassedDeliveryStatuses(msg);
-			var msgContract = new MessageAnswerContract()
-			{
-				Id = msg.Id,
-				PassedDeliveryStatuses = passed,
-				CreationDate = msg.CreationDate,
-				LastStatusDescription = msg.StatusDescription,
-				DeliveryDate = msg.DeliveryDate,
-				MessageText = msg.MessageText,
-				RecieverLogin = reciever.FirstOrDefault(),
-				SenderLogin = sender,
-			};
+
+			var msgContract = new MessageAnswerContract(msg, passed, reciever.FirstOrDefault(), sender);
 
 			return msgContract;
 	    }
