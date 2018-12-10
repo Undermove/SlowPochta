@@ -2,17 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Quartz;
 using Quartz.Impl;
 using SlowPochta.Business.Module.Configuration;
 using SlowPochta.Business.Module.Modules;
 using SlowPochta.Data.Model;
 using SlowPochta.Data.Repository;
+using Microsoft.Extensions.Logging;
+using SlowPochta.Core;
 
 namespace SlowPochta.Business.Module
 {
     public class MessageStatusUpdater : IDisposable
     {
+        private static readonly ILogger Logger = ApplicationLogging.CreateLogger<MessageStatusUpdater>();
+
         private readonly IScheduler _scheduler;
         private readonly DataContext _dataContext;
         private readonly MessageModule _messageModule;
@@ -57,6 +62,7 @@ namespace SlowPochta.Business.Module
         private void CreateJob(Message message)
         {
             var id = Guid.NewGuid().ToString();
+            Logger.LogInformation($"Job for {message.Id} is being created");
 
             IJobDetail job = JobBuilder.Create<ChangeMessageDeliveryStatusJob>()
                 .WithIdentity(id)
@@ -76,18 +82,20 @@ namespace SlowPochta.Business.Module
                 .Build();
 
             _scheduler.ScheduleJob(job, trigger);
+            Logger.LogInformation($"Job for {message.Id} has been succesfully created");
         }
 
         public class ChangeMessageDeliveryStatusJob : IJob
         {
             public async Task Execute(IJobExecutionContext context)
-            {
+            {                
                 JobDataMap data = context.JobDetail.JobDataMap;
 
                 Message message = (Message) data.Get("message");
                 IScheduler scheduler = (IScheduler) data.Get("scheduler");
                 DataContext dataContext = (DataContext) data.Get("dataContext");
                 string jobId = (string) data.Get("jobId");
+                Logger.LogInformation($"Job for {message.Id} is in proccess");
 
                 switch (message.Status)
                 {
@@ -110,8 +118,8 @@ namespace SlowPochta.Business.Module
                     message.Status = DeliveryStatus.Delivered;
 					await scheduler.DeleteJob(new JobKey(jobId));
 				}
-
-				await AddPassedDeliveryStatus(dataContext, message, statusId);
+                Logger.LogInformation($"Job for {message.Id} with {statusId} has been done");
+                await AddPassedDeliveryStatus(dataContext, message, statusId);
             }
 
 	        private static async Task AddPassedDeliveryStatus(DataContext dataContext, Message message, int statusId)
