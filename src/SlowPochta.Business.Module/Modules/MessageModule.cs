@@ -14,6 +14,7 @@ namespace SlowPochta.Business.Module.Modules
 	public class MessageModule : IDisposable
 	{
 		private readonly DataContext _dataContext;
+		public Guid guid = Guid.NewGuid();
 
 		public MessageModule(DesignTimeDbContextFactory contextFactory)
 		{

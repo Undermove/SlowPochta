@@ -114,25 +114,20 @@ namespace SlowPochta.Business.Module
 	            statusId++;
 				if (message.StatusDescription == FinalStatusDescription)
                 {
-					message.DeliveryDate = DateTime.UtcNow;
                     message.Status = DeliveryStatus.Delivered;
 					await scheduler.DeleteJob(new JobKey(jobId));
 				}
-                Logger.LogInformation($"Job for {message.Id} with {statusId} has been done");
-                await AddPassedDeliveryStatus(dataContext, message, statusId);
-            }
 
-	        private static async Task AddPassedDeliveryStatus(DataContext dataContext, Message message, int statusId)
-	        {
-		        await dataContext.MessagePassedDeliveryStatuses.AddAsync(new MessagePassedDeliveryStatus()
-		        {
-			        MessageId = message.Id,
-			        DeliveryStatusVariantId = statusId,
-					TransitionDateTime = DateTime.UtcNow
-		        });
+	            await dataContext.MessagePassedDeliveryStatuses.AddAsync(new MessagePassedDeliveryStatus()
+	            {
+		            MessageId = message.Id,
+		            DeliveryStatusVariantId = statusId,
+		            TransitionDateTime = DateTime.UtcNow
+	            });
 
-		        dataContext.Messages.Update(message);
-		        await dataContext.SaveChangesAsync();
+	            message.LastUpdateTime = DateTime.UtcNow;
+				dataContext.Messages.Update(message);
+	            await dataContext.SaveChangesAsync();
 			}
 
 	        private (int, string) GetRandomStatus(DataContext dContext)

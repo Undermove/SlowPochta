@@ -41,7 +41,6 @@ namespace SlowPochta.Api
 
 			services.AddSingleton<DesignTimeDbContextFactory>();
 			services.AddSingleton<AuthModule>();
-			services.AddSingleton<MessageModule>();
 			services.AddSingleton<UsersModule>();
 			services.AddSingleton<MessageStatusUpdater>();
 			services.AddSingleton<MessageStatusUpdaterConfig>();
@@ -79,6 +78,12 @@ namespace SlowPochta.Api
 			services.AddCors();
 
 			_containerProvider = services.BuildServiceProvider();
+
+			//Singleton may not be singleton fix. See this for details https://weblogs.thinktecture.com/pawel/2017/08/aspnet-core-beware-singleton-may-not-be-singleton.html
+			MessageModule messageModule = new MessageModule(_containerProvider.GetService<DesignTimeDbContextFactory>());
+			services.AddSingleton(messageModule);
+			_containerProvider = services.BuildServiceProvider();
+
 			Start();
 		}
 

@@ -21,7 +21,7 @@ namespace SlowPochta.Business.Module.DataContracts
 			LastStatusDescription = msg.StatusDescription;
 			PassedDeliveryStatuses = passedStatuses;
 			CreationDate = msg.CreationDate;
-			DeliveryDate = msg.DeliveryDate;
+			LastUpdateTime = msg.LastUpdateTime;
 		}
 
 		public long Id { get; set; }
@@ -38,6 +38,6 @@ namespace SlowPochta.Business.Module.DataContracts
 
 		public DateTime CreationDate { get; set; }
 
-		public DateTime? DeliveryDate { get; set; }
+		public DateTime? LastUpdateTime { get; set; }
 	}
 }
