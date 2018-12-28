@@ -55,7 +55,8 @@ namespace SlowPochta.Business.Module.Modules
 				Status = DeliveryStatus.Created,
 				CreationDate = DateTime.UtcNow,
 				MessageText = messageContract.MessageText,
-				StatusDescription = "In local postbox"
+				StatusDescription = "In local postbox",
+				IsRead = false
 			});
 
 			await _dataContext.SaveChangesAsync();

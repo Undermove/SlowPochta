@@ -17,7 +17,7 @@ namespace SlowPochta.Api.Controllers
 
         private readonly MessageModule _messageModule;
 
-	    public MessageController(MessageModule messageModule)
+		public MessageController(MessageModule messageModule)
 	    {
 		    _messageModule = messageModule;
 	    }

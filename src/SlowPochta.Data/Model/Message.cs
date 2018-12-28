@@ -15,5 +15,7 @@ namespace SlowPochta.Data.Model
 		public DeliveryStatus Status { get; set; }
 
 		public string StatusDescription { get; set; }
+
+		public bool IsRead { get; set; }
 	}
 }
