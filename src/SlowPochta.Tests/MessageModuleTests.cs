@@ -34,7 +34,7 @@ namespace SlowPochta.Tests
         public async void CreateMessageSuccessTest()
         {
             // arrange
-            MessageContract testMessageContract = new MessageContract()
+            MessageRequestContract testMessageRequestContract = new MessageRequestContract()
             {
                 FromUser = "sender",
                 ToUser = "recipient",
@@ -58,14 +58,14 @@ namespace SlowPochta.Tests
             _dataContext.SaveChanges();
 
             // act
-            bool result = await _messageModule.CreateMessage(testMessageContract);
+            bool result = await _messageModule.CreateMessage(testMessageRequestContract);
 
             // assert
             Assert.True(result);
 
             var message =
                 _dataContext.Messages
-                    .FirstOrDefault(msg => msg.MessageText == testMessageContract.MessageText);
+                    .FirstOrDefault(msg => msg.MessageText == testMessageRequestContract.MessageText);
             Assert.NotNull(message);
             Assert.Equal(1, _dataContext.Messages.Count());
 
@@ -84,7 +84,7 @@ namespace SlowPochta.Tests
         public async void CreateMessageForAbsentRecipientTest()
         {
             // arrange
-            MessageContract testMessageContract = new MessageContract()
+            MessageRequestContract testMessageRequestContract = new MessageRequestContract()
             {
                 FromUser = "sender",
                 ToUser = "badRecipient",
@@ -108,14 +108,14 @@ namespace SlowPochta.Tests
             _dataContext.SaveChanges();
 
             // act
-            bool result = await _messageModule.CreateMessage(testMessageContract);
+            bool result = await _messageModule.CreateMessage(testMessageRequestContract);
 
             // assert
             Assert.False(result);
 
             var message =
                 _dataContext.Messages
-                    .FirstOrDefault(msg => msg.MessageText == testMessageContract.MessageText);
+                    .FirstOrDefault(msg => msg.MessageText == testMessageRequestContract.MessageText);
             Assert.Null(message);
             Assert.Equal(0, _dataContext.Messages.Count());
 
@@ -134,7 +134,7 @@ namespace SlowPochta.Tests
         public async void CreateMessageForAbsentSenderTest()
         {
             // arrange
-            MessageContract testMessageContract = new MessageContract()
+            MessageRequestContract testMessageRequestContract = new MessageRequestContract()
             {
                 FromUser = "badSender",
                 ToUser = "recipient",
@@ -158,14 +158,14 @@ namespace SlowPochta.Tests
             _dataContext.SaveChanges();
 
             // act
-            bool result = await _messageModule.CreateMessage(testMessageContract);
+            bool result = await _messageModule.CreateMessage(testMessageRequestContract);
 
             // assert
             Assert.False(result);
 
             var message =
                 _dataContext.Messages
-                    .FirstOrDefault(msg => msg.MessageText == testMessageContract.MessageText);
+                    .FirstOrDefault(msg => msg.MessageText == testMessageRequestContract.MessageText);
             Assert.Null(message);
             Assert.Equal(0, _dataContext.Messages.Count());
 

@@ -36,14 +36,14 @@ namespace SlowPochta.Api.Controllers
 
         [Authorize]
 		[HttpPost]
-        public async Task<IActionResult> CreateMessage([FromBody] MessageContract messageContract)
+        public async Task<IActionResult> CreateMessage([FromBody] MessageRequestContract messageRequestContract)
         {
-            if (await _messageModule.CreateMessage(messageContract))
+            if (await _messageModule.CreateMessage(messageRequestContract))
             {
-                Logger.LogInformation($"The message from {messageContract.FromUser} to {messageContract.ToUser} was created");
+                Logger.LogInformation($"The message from {messageRequestContract.FromUser} to {messageRequestContract.ToUser} was created");
                 return Ok("Message created");
             }
-            Logger.LogInformation($"Message {messageContract.MessageText} from {messageContract.FromUser} to {messageContract.ToUser} wasn't created");
+            Logger.LogInformation($"Message {messageRequestContract.MessageText} from {messageRequestContract.FromUser} to {messageRequestContract.ToUser} wasn't created");
             return BadRequest("Message was'n created");
         }
 
@@ -75,5 +75,23 @@ namespace SlowPochta.Api.Controllers
             Logger.LogInformation($"The user: {currentUserLogin} got his message ID info successfully");
             return Json(message);
         }
-    }
+
+	    [Authorize]
+	    [HttpGet]
+	    [Route("markread")]
+		public async Task<IActionResult> MarkRead([FromQuery] SingleItemRequest request)
+	    {
+		    if (request.Id == null)
+		    {
+			    Logger.LogInformation($"The request ID: {request.Id} was empty");
+			    return BadRequest("Request Id is Empty");
+		    }
+
+		    string currentUserLogin = User.Identity.Name;
+		    Logger.LogInformation($"Message {request.Id} was marked read by user: {currentUserLogin}");
+		    await _messageModule.MarkMessageRead(request.Id.Value);
+		    Logger.LogInformation($"The user: {currentUserLogin} marked message {request.Id} info successfully");
+		    return Ok();
+	    }
+	}
 }

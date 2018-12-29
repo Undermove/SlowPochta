@@ -22,6 +22,7 @@ namespace SlowPochta.Business.Module.DataContracts
 			PassedDeliveryStatuses = passedStatuses;
 			CreationDate = msg.CreationDate;
 			LastUpdateTime = msg.LastUpdateTime;
+			IsRead = msg.IsRead;
 		}
 
 		public long Id { get; set; }
@@ -33,6 +34,8 @@ namespace SlowPochta.Business.Module.DataContracts
 		public string MessageText { get; set; }
 
 		public string LastStatusDescription { get; set; }
+
+		public bool IsRead { get; set; }
 
 		public List<MessageDeliveryStatusContract> PassedDeliveryStatuses { get; set; }
 
