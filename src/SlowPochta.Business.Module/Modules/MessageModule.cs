@@ -28,22 +28,22 @@ namespace SlowPochta.Business.Module.Modules
 
 		public event EventHandler<Message> MessageCreated;
 
-		public async Task<bool> CreateMessage(MessageContract messageContract)
+		public async Task<bool> CreateMessage(MessageRequestContract messageRequestContract)
 		{
-		    if (messageContract == null)
+		    if (messageRequestContract == null)
 		    {
 		        return false;
 		    }
 
 			// check that sender presents in database
-			var fromUser = await GetUserFromDb(messageContract.FromUser);
+			var fromUser = await GetUserFromDb(messageRequestContract.FromUser);
 			if (fromUser == null)
 			{
 				return false;
 			}
 
 			// check that reciever presents in database
-			var toUser = await GetUserFromDb(messageContract.ToUser);
+			var toUser = await GetUserFromDb(messageRequestContract.ToUser);
 			if (toUser == null)
 			{
 				return false;
@@ -54,8 +54,9 @@ namespace SlowPochta.Business.Module.Modules
 			{
 				Status = DeliveryStatus.Created,
 				CreationDate = DateTime.UtcNow,
-				MessageText = messageContract.MessageText,
-				StatusDescription = "In local postbox"
+				MessageText = messageRequestContract.MessageText,
+				StatusDescription = "In local postbox",
+				IsRead = false
 			});
 
 			await _dataContext.SaveChangesAsync();
@@ -241,7 +242,22 @@ namespace SlowPochta.Business.Module.Modules
 			return msgContract;
 	    }
 
-	    private async Task<Message> GetMessageFromDb(long idNumber)
+		public async Task MarkMessageRead(long messageId)
+		{
+			// check that messageId presents in database
+			var msg = await GetMessageFromDb(messageId);
+			if (msg == null)
+			{
+				return;
+			}
+
+			msg.IsRead = true;
+
+			_dataContext.Messages.Update(msg);
+			await _dataContext.SaveChangesAsync();
+		}
+
+		private async Task<Message> GetMessageFromDb(long idNumber)
 	    {
 	        return await _dataContext.Messages.FirstOrDefaultAsync(id => id.Id.Equals(idNumber));
 	    }
