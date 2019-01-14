@@ -1,12 +1,18 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Net.WebSockets;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using SlowPochta.Api.Configuration;
+using SlowPochta.Api.WebSocketBehaviors;
 using SlowPochta.Business.Module;
 using SlowPochta.Business.Module.Configuration;
 using SlowPochta.Business.Module.Modules;
@@ -19,6 +25,7 @@ namespace SlowPochta.Api
 	public class Startup
 	{
 		private ServiceProvider _containerProvider;
+		private WebSocketsModule _webSocketsModule;
 		private readonly AuthOptions _authOptions;
 		private readonly IConfigurationRoot _configuration;
 
@@ -42,8 +49,11 @@ namespace SlowPochta.Api
 			services.AddSingleton<DesignTimeDbContextFactory>();
 			services.AddSingleton<AuthModule>();
 			services.AddSingleton<UsersModule>();
+			services.AddSingleton<WebSocketsModule>();
 			services.AddSingleton<MessageStatusUpdater>();
 			services.AddSingleton<MessageStatusUpdaterConfig>();
+
+			services.AddTransient<IWebSocketBehavior, AuthConnectionBehavior>();
 
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options =>
@@ -83,6 +93,8 @@ namespace SlowPochta.Api
 			MessageModule messageModule = new MessageModule(_containerProvider.GetService<DesignTimeDbContextFactory>());
 			services.AddSingleton(messageModule);
 			_containerProvider = services.BuildServiceProvider();
+
+			_webSocketsModule = _containerProvider.GetService<WebSocketsModule>();
 
 			Start();
 		}
@@ -125,6 +137,20 @@ namespace SlowPochta.Api
 
 			app.UseDefaultFiles();
 			app.UseStaticFiles();
+
+            var webSocketOptions = new WebSocketOptions() 
+            {
+                KeepAliveInterval = TimeSpan.FromSeconds(120),
+                ReceiveBufferSize = 4 * 1024
+            };
+
+            app.UseWebSockets(webSocketOptions);
+
+
+			app.Use(async (context, next) =>
+			{
+				await _webSocketsModule.ProcessWebSocketRequest(context, next);
+			});
 
 			app.UseAuthentication();
 			app.UseHttpsRedirection();
