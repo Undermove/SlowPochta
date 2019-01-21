@@ -1,12 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Net.WebSockets;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.IO;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -25,7 +20,7 @@ namespace SlowPochta.Api
 	public class Startup
 	{
 		private ServiceProvider _containerProvider;
-		private WebSocketsModule _webSocketsModule;
+		private WebSocketsRoutesManager _webSocketsRoutesManager;
 		private readonly AuthOptions _authOptions;
 		private readonly IConfigurationRoot _configuration;
 
@@ -49,11 +44,11 @@ namespace SlowPochta.Api
 			services.AddSingleton<DesignTimeDbContextFactory>();
 			services.AddSingleton<AuthModule>();
 			services.AddSingleton<UsersModule>();
-			services.AddSingleton<WebSocketsModule>();
 			services.AddSingleton<MessageStatusUpdater>();
 			services.AddSingleton<MessageStatusUpdaterConfig>();
 
-			services.AddTransient<IWebSocketBehavior, AuthConnectionBehavior>();
+			services.AddSingleton<WebSocketsRoutesManager>();
+			services.AddSingleton<WebSocketsRoutesManagerConfig>();
 
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options =>
@@ -94,18 +89,14 @@ namespace SlowPochta.Api
 			services.AddSingleton(messageModule);
 			_containerProvider = services.BuildServiceProvider();
 
-			_webSocketsModule = _containerProvider.GetService<WebSocketsModule>();
-
 			Start();
 		}
 
-		public void Start()
+		private void ConfigureWebSockets()
 		{
-			var loggerFactory = _containerProvider.GetService<ILoggerFactory>();
-			ApplicationLogging.LoggerFactory = loggerFactory;
-
-			var msu = _containerProvider.GetService<MessageStatusUpdater>();
-			msu.StartService();
+			_webSocketsRoutesManager = _containerProvider.GetService<WebSocketsRoutesManager>();
+			_webSocketsRoutesManager.AddWebSocketService<TestBehavior>("/test");
+			_webSocketsRoutesManager.Start();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -138,23 +129,20 @@ namespace SlowPochta.Api
 			app.UseDefaultFiles();
 			app.UseStaticFiles();
 
-            var webSocketOptions = new WebSocketOptions() 
-            {
-                KeepAliveInterval = TimeSpan.FromSeconds(120),
-                ReceiveBufferSize = 4 * 1024
-            };
-
-            app.UseWebSockets(webSocketOptions);
-
-
-			app.Use(async (context, next) =>
-			{
-				await _webSocketsModule.ProcessWebSocketRequest(context, next);
-			});
-
 			app.UseAuthentication();
 			app.UseHttpsRedirection();
 			app.UseMvc();
+		}
+
+		public void Start()
+		{
+			var loggerFactory = _containerProvider.GetService<ILoggerFactory>();
+			ApplicationLogging.LoggerFactory = loggerFactory;
+
+			ConfigureWebSockets();
+
+			var msu = _containerProvider.GetService<MessageStatusUpdater>();
+			msu.StartService();
 		}
 	}
 }
