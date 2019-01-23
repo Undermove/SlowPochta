@@ -5,13 +5,13 @@ using WebSocketSharp.Server;
 
 namespace SlowPochta.Api.WebSocketBehaviors
 {
-	public class TestBehavior : WebSocketBehavior, IWebSocketBehaviorContainer
+	public class AuthSocketBehavior : WebSocketBehavior, IWebSocketBehaviorContainer
 	{
-		public string Path { get; } = "/test";
+		public string Path { get; } = "/auth";
 
 		public WebSocketBehavior Behavior { get; }
 
-		public TestBehavior()
+		public AuthSocketBehavior(AuthModule authModule)
 		{
 			Behavior = this;
 		}
@@ -33,6 +33,8 @@ namespace SlowPochta.Api.WebSocketBehaviors
 				: "I'm not available now.";
 			Console.WriteLine(msg);
 			Send(msg);
+			Console.WriteLine(this.Sessions.ActiveIDs);
+			
 		}
 
 		protected override void OnOpen()

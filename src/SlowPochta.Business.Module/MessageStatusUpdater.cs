@@ -9,7 +9,6 @@ using SlowPochta.Business.Module.Configuration;
 using SlowPochta.Business.Module.Modules;
 using SlowPochta.Data.Model;
 using SlowPochta.Data.Repository;
-using Microsoft.Extensions.Logging;
 using SlowPochta.Core;
 
 namespace SlowPochta.Business.Module

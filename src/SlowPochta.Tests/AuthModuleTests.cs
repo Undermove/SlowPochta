@@ -1,8 +1,12 @@
 using System;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using Moq;
+using SlowPochta.Api.Configuration;
 using SlowPochta.Business.Module;
+using SlowPochta.Business.Module.DataContracts;
 using SlowPochta.Business.Module.Modules;
+using SlowPochta.Business.Module.Responses;
 using SlowPochta.Data.Model;
 using SlowPochta.Data.Repository;
 using Xunit;
@@ -13,13 +17,15 @@ namespace SlowPochta.Tests
 	{
 		private readonly AuthModule _authModule;
 		private readonly DataContext _dataContext;
+		private readonly Mock<AuthOptions> _authOptionsMock;
 
 		public AuthModuleTests()
 		{
 			var contextFactory = new DesignTimeDbContextFactory();
 			_dataContext = contextFactory.CreateDbContext(new string[]{});
 			_dataContext.Database.Migrate();
-			_authModule = new AuthModule(contextFactory);
+			_authOptionsMock = new Mock<AuthOptions>(); 
+			_authModule = new AuthModule(contextFactory, _authOptionsMock.Object);
 		}
 
 		public void Dispose()
@@ -44,7 +50,11 @@ namespace SlowPochta.Tests
 			_dataContext.SaveChanges();
 
 			// act
-			ClaimsIdentity claims = _authModule.GetIdentity(testUser.Login, testUser.Password);
+			AuthResponse claims = _authModule.GenerateAuthResponse(
+				new PersonContract
+				{
+					Login = testUser.Login, Password = testUser.Password
+				});
 
 			// assert
 			Assert.NotNull(claims);
@@ -64,7 +74,12 @@ namespace SlowPochta.Tests
 			_dataContext.Users.Add(testUser);
 
 			// act
-			ClaimsIdentity claims = _authModule.GetIdentity("wrong login", "wrong password");
+			AuthResponse claims = _authModule.GenerateAuthResponse(
+				new PersonContract
+				{
+					Login = "wrong login",
+					Password = "wrong pass"
+				});
 
 			// assert
 			Assert.Null(claims);

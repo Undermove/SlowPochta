@@ -48,6 +48,7 @@ namespace SlowPochta.Api
 			services.AddSingleton<MessageStatusUpdaterConfig>();
 
 			services.AddSingleton<WebSocketsRoutesManager>();
+			services.AddTransient<AuthSocketBehavior>();
 			services.AddSingleton<WebSocketsRoutesManagerConfig>();
 
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -95,7 +96,8 @@ namespace SlowPochta.Api
 		private void ConfigureWebSockets()
 		{
 			_webSocketsRoutesManager = _containerProvider.GetService<WebSocketsRoutesManager>();
-			_webSocketsRoutesManager.AddWebSocketService<TestBehavior>("/test");
+			//_webSocketsRoutesManager.AddWebSocketService<AuthSocketBehavior>("/test");
+			_webSocketsRoutesManager.AddWebSocketService("/test", () => _containerProvider.GetService<AuthSocketBehavior>());
 			_webSocketsRoutesManager.Start();
 		}
 
