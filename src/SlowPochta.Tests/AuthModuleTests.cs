@@ -2,8 +2,8 @@ using System;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using SlowPochta.Api.Configuration;
 using SlowPochta.Business.Module;
+using SlowPochta.Business.Module.Configuration;
 using SlowPochta.Business.Module.DataContracts;
 using SlowPochta.Business.Module.Modules;
 using SlowPochta.Business.Module.Responses;
@@ -17,14 +17,14 @@ namespace SlowPochta.Tests
 	{
 		private readonly AuthModule _authModule;
 		private readonly DataContext _dataContext;
-		private readonly Mock<AuthOptions> _authOptionsMock;
+		private readonly Mock<AuthOptionsConfig> _authOptionsMock;
 
 		public AuthModuleTests()
 		{
 			var contextFactory = new DesignTimeDbContextFactory();
 			_dataContext = contextFactory.CreateDbContext(new string[]{});
 			_dataContext.Database.Migrate();
-			_authOptionsMock = new Mock<AuthOptions>(); 
+			_authOptionsMock = new Mock<AuthOptionsConfig>(); 
 			_authModule = new AuthModule(contextFactory, _authOptionsMock.Object);
 		}
 

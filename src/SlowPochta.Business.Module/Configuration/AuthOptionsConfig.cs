@@ -3,9 +3,9 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace SlowPochta.Api.Configuration
+namespace SlowPochta.Business.Module.Configuration
 {
-	public class AuthOptions
+	public class AuthOptionsConfig
 	{
 		public virtual string Issuer { get; }
 		public virtual string Audience { get; }
@@ -15,7 +15,7 @@ namespace SlowPochta.Api.Configuration
 
 		private const string AuthSection = "Auth";
 
-		public AuthOptions(IConfigurationRoot configuration)
+		public AuthOptionsConfig(IConfigurationRoot configuration)
 		{
 			Issuer = configuration[$"{AuthSection}:Issuer"];
 			Audience = configuration[$"{AuthSection}:Audience"];
