@@ -20,8 +20,9 @@ namespace SlowPochta.Business.Module.Modules
 {
 	public class AuthModule : IDisposable
 	{
-		private readonly AuthOptionsConfig _authOptionsConfig;
 		private static readonly ILogger Logger = ApplicationLogging.CreateLogger<AuthModule>();
+
+		private readonly AuthOptionsConfig _authOptionsConfig;
 		private readonly DataContext _context;
 
 		public AuthModule(DesignTimeDbContextFactory context, AuthOptionsConfig authOptionsConfig)
@@ -78,38 +79,42 @@ namespace SlowPochta.Business.Module.Modules
 			return claimsIdentity;
 		}
 
-		public string CheckJwtToken(string token)
+		public string GetLoginFromToken(string token)
 		{
 			WebSocketAuthHeader tokenHeader = JsonConvert.DeserializeObject<WebSocketAuthHeader>(token);
 
 			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authOptionsConfig.Key));
-			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 			var validator = new JwtSecurityTokenHandler();
 
-			TokenValidationParameters validationParameters = new TokenValidationParameters();
-			validationParameters.ValidIssuer = _authOptionsConfig.Issuer;
-			validationParameters.ValidAudience = _authOptionsConfig.Audience;
-			validationParameters.IssuerSigningKey = key;
-			validationParameters.ValidateIssuerSigningKey = true;
-			validationParameters.ValidateAudience = true;
+			TokenValidationParameters validationParameters =
+				new TokenValidationParameters
+				{
+					ValidIssuer = _authOptionsConfig.Issuer,
+					ValidAudience = _authOptionsConfig.Audience,
+					IssuerSigningKey = key,
+					ValidateIssuerSigningKey = true,
+					ValidateAudience = true
+				};
 
-			if (validator.CanReadToken(tokenHeader.Token))
+			if (!validator.CanReadToken(tokenHeader.Token))
 			{
-				try
-				{
-					var principal = validator.ValidateToken(tokenHeader.Token, validationParameters, out _);
-					if (principal.HasClaim(c => c.Type == ClaimTypes.Name))
-					{
-						return principal.Claims.First(c => c.Type == ClaimTypes.Name).Value;
-					}
-				}
-				catch (Exception e)
-				{
-					Logger.LogError(null, e);
-				}
+				return null;
 			}
 
-			return String.Empty;
+			try
+			{
+				var principal = validator.ValidateToken(tokenHeader.Token, validationParameters, out _);
+				if (principal.HasClaim(c => c.Type == ClaimTypes.Name))
+				{
+					return principal.Claims.First(c => c.Type == ClaimTypes.Name).Value;
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.LogError(null, e);
+			}
+
+			return null;
 		}
 
 		public void Dispose()

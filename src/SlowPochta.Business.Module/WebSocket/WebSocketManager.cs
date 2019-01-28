@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using SlowPochta.Business.Module.Configuration;
-using WebSocketSharp;
-using WebSocketSharp.Net;
+using SlowPochta.Business.Module.Modules;
 using WebSocketSharp.Server;
 
-namespace SlowPochta.Business.Module.Modules
+namespace SlowPochta.Business.Module.WebSocket
 {
 	public class WebSocketsRoutesManager : IDisposable
 	{
@@ -24,6 +23,11 @@ namespace SlowPochta.Business.Module.Modules
 
 		public void Start()
 		{
+			foreach (var host in _webSocketServer.WebSocketServices.Hosts)
+			{
+				_ = host.Sessions;
+			}
+
 			_webSocketServer.Start();
 		}
 

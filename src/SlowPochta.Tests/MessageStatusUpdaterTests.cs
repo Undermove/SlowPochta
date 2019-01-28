@@ -7,6 +7,7 @@ using Moq;
 using SlowPochta.Business.Module;
 using SlowPochta.Business.Module.Configuration;
 using SlowPochta.Business.Module.Modules;
+using SlowPochta.Business.Module.Services;
 using SlowPochta.Data.Model;
 using SlowPochta.Data.Repository;
 using Xunit;

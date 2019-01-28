@@ -28,6 +28,12 @@ namespace SlowPochta.Business.Module.Modules
 
 		public event EventHandler<Message> MessageCreated;
 
+		public class MessageCreatedEventArgs : EventArgs
+		{
+			public string Login { get; set; }
+			public Message Message { get; set; }
+		}
+
 		public async Task<bool> CreateMessage(MessageRequestContract messageRequestContract)
 		{
 		    if (messageRequestContract == null)
@@ -145,7 +151,7 @@ namespace SlowPochta.Business.Module.Modules
 
 			foreach (var message in messages)
 			{
-				var recieverUsersLogins = await GetRecieversUsersLogins(message);
+				var recieverUsersLogins = await GetRecieversUsersLogins(message.Id);
 
 				var passed = await GetPassedDeliveryStatuses(message);
 
@@ -160,10 +166,10 @@ namespace SlowPochta.Business.Module.Modules
 			return messageAnswers;
 		}
 
-		private async Task<List<string>> GetRecieversUsersLogins(Message message)
+		public async Task<List<string>> GetRecieversUsersLogins(long messageId)
 		{
 			var toUsersIds = await _dataContext.MessagesToUsers
-				.Where(mtu => mtu.MessageId == message.Id)
+				.Where(mtu => mtu.MessageId == messageId)
 				.Select(user => user.UserId)
 				.ToListAsync();
 
@@ -227,7 +233,7 @@ namespace SlowPochta.Business.Module.Modules
                 return new MessageAnswerContract();
 	        }
 
-		    var reciever = await GetRecieversUsersLogins(msg);
+		    var reciever = await GetRecieversUsersLogins(msg.Id);
 		    var sender = await GetSenderUserLogin(msg);
 
             if (sender != requesterName && !reciever.Contains(requesterName))

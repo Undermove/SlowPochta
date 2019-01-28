@@ -10,6 +10,8 @@ using SlowPochta.Api.WebSocketBehaviors;
 using SlowPochta.Business.Module;
 using SlowPochta.Business.Module.Configuration;
 using SlowPochta.Business.Module.Modules;
+using SlowPochta.Business.Module.Services;
+using SlowPochta.Business.Module.WebSocket;
 using SlowPochta.Core;
 using SlowPochta.Data.Repository;
 using Swashbuckle.AspNetCore.Swagger;
@@ -47,7 +49,7 @@ namespace SlowPochta.Api
 			services.AddSingleton<MessageStatusUpdaterConfig>();
 
 			services.AddSingleton<WebSocketsRoutesManager>();
-			services.AddTransient<AuthSocketBehavior>();
+			services.AddTransient<MessageNotificationBehavior>();
 			services.AddSingleton<WebSocketsRoutesManagerConfig>();
 
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -96,7 +98,7 @@ namespace SlowPochta.Api
 		{
 			_webSocketsRoutesManager = _containerProvider.GetService<WebSocketsRoutesManager>();
 			//_webSocketsRoutesManager.AddWebSocketService<AuthSocketBehavior>("/test");
-			_webSocketsRoutesManager.AddWebSocketService("/test", () => _containerProvider.GetService<AuthSocketBehavior>());
+			_webSocketsRoutesManager.AddWebSocketService("/test", () => _containerProvider.GetService<MessageNotificationBehavior>());
 			_webSocketsRoutesManager.Start();
 		}
 
