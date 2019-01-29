@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SlowPochta.Business.Module.DataContracts;
+using SlowPochta.Business.Module.Services;
+using SlowPochta.Core;
 using SlowPochta.Data.Model;
 using SlowPochta.Data.Repository;
 
@@ -27,6 +29,13 @@ namespace SlowPochta.Business.Module.Modules
 		}
 
 		public event EventHandler<Message> MessageCreated;
+		public event Func<object, MessageDeliveredEventArgs, Task>  MessageMarkedRead;
+
+		public class MessageCreatedEventArgs : EventArgs
+		{
+			public string Login { get; set; }
+			public Message Message { get; set; }
+		}
 
 		public async Task<bool> CreateMessage(MessageRequestContract messageRequestContract)
 		{
@@ -145,7 +154,7 @@ namespace SlowPochta.Business.Module.Modules
 
 			foreach (var message in messages)
 			{
-				var recieverUsersLogins = await GetRecieversUsersLogins(message);
+				var recieverUsersLogins = await GetRecieversUsersLogins(message.Id);
 
 				var passed = await GetPassedDeliveryStatuses(message);
 
@@ -160,10 +169,10 @@ namespace SlowPochta.Business.Module.Modules
 			return messageAnswers;
 		}
 
-		private async Task<List<string>> GetRecieversUsersLogins(Message message)
+		public async Task<List<string>> GetRecieversUsersLogins(long messageId)
 		{
 			var toUsersIds = await _dataContext.MessagesToUsers
-				.Where(mtu => mtu.MessageId == message.Id)
+				.Where(mtu => mtu.MessageId == messageId)
 				.Select(user => user.UserId)
 				.ToListAsync();
 
@@ -227,7 +236,7 @@ namespace SlowPochta.Business.Module.Modules
                 return new MessageAnswerContract();
 	        }
 
-		    var reciever = await GetRecieversUsersLogins(msg);
+		    var reciever = await GetRecieversUsersLogins(msg.Id);
 		    var sender = await GetSenderUserLogin(msg);
 
             if (sender != requesterName && !reciever.Contains(requesterName))
@@ -255,6 +264,7 @@ namespace SlowPochta.Business.Module.Modules
 
 			_dataContext.Messages.Update(msg);
 			await _dataContext.SaveChangesAsync();
+			await MessageMarkedRead.InvokeEventAsync(new MessageDeliveredEventArgs() { MessageId = messageId });
 		}
 
 		private async Task<Message> GetMessageFromDb(long idNumber)
