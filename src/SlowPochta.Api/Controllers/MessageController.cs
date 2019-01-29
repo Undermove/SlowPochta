@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,19 @@ namespace SlowPochta.Api.Controllers
             return Json(messages);
         }
 
-        [Authorize]
+	    [Authorize]
+	    [HttpGet]
+	    [Route("getnewmessagescount")]
+	    public async Task<IActionResult> GetNewMessagesCount()
+	    {
+		    string currentUserLogin = User.Identity.Name;
+		    Logger.LogInformation($"Delivered messages count were requested from user: {currentUserLogin}");
+		    List<MessageAnswerContract> messages = await _messageModule.GetDeliveredMessagesToUser(currentUserLogin);
+		    Logger.LogInformation($"The user: {currentUserLogin} got his delivered messages successfully");
+		    return Json(messages.Count(contract => !contract.IsRead));
+	    }
+
+		[Authorize]
 		[HttpPost]
         public async Task<IActionResult> CreateMessage([FromBody] MessageRequestContract messageRequestContract)
         {

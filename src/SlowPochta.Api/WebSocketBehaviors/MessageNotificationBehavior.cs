@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using SlowPochta.Business.Module.Modules;
 using SlowPochta.Business.Module.Services;
 using SlowPochta.Core;
+using SlowPochta.Data.Model;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
@@ -29,6 +30,7 @@ namespace SlowPochta.Api.WebSocketBehaviors
 		{
 			_authModule = authModule;
 			_messageModule = messageModule;
+			_messageModule.MessageMarkedRead += OnMessageMarkedRead;
 
 			_messageStatusUpdater = messageStatusUpdater;
 			_messageStatusUpdater.MessageDelivered += OnMessageDelivered;
@@ -39,6 +41,8 @@ namespace SlowPochta.Api.WebSocketBehaviors
 		public void Dispose()
 		{
 			_messageStatusUpdater.MessageDelivered -= OnMessageDelivered;
+			_messageModule.MessageMarkedRead -= OnMessageMarkedRead;
+
 			_authModule?.Dispose();
 			_messageModule?.Dispose();
 		}
@@ -89,9 +93,21 @@ namespace SlowPochta.Api.WebSocketBehaviors
 			}
 		}
 
-		private void Completed(bool obj)
+		private async Task OnMessageMarkedRead(object sender, MessageDeliveredEventArgs e)
 		{
-			Logger.LogTrace("Delivered");
+			try
+			{
+				List<string> login = await _messageModule.GetRecieversUsersLogins(e.MessageId);
+
+				if (_loginsToSessionIds.TryGetValue(login.FirstOrDefault(), out var sessionId))
+				{
+					Sessions[sessionId].Context.WebSocket.Send(JsonConvert.SerializeObject(new { notification = "message marked read" }));
+				}
+			}
+			catch (Exception exception)
+			{
+				Logger.LogCritical(exception, "Something went wrong during notification handling");
+			}
 		}
 	}
 }

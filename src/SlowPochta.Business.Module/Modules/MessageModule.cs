@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SlowPochta.Business.Module.DataContracts;
+using SlowPochta.Business.Module.Services;
+using SlowPochta.Core;
 using SlowPochta.Data.Model;
 using SlowPochta.Data.Repository;
 
@@ -27,6 +29,7 @@ namespace SlowPochta.Business.Module.Modules
 		}
 
 		public event EventHandler<Message> MessageCreated;
+		public event Func<object, MessageDeliveredEventArgs, Task>  MessageMarkedRead;
 
 		public class MessageCreatedEventArgs : EventArgs
 		{
@@ -261,6 +264,7 @@ namespace SlowPochta.Business.Module.Modules
 
 			_dataContext.Messages.Update(msg);
 			await _dataContext.SaveChangesAsync();
+			await MessageMarkedRead.InvokeEventAsync(new MessageDeliveredEventArgs() { MessageId = messageId });
 		}
 
 		private async Task<Message> GetMessageFromDb(long idNumber)
