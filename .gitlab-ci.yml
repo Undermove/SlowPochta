@@ -5,20 +5,19 @@ stages:
   - test
 
 variables:
-    test: "Example.Test"
+  test: "SlowPochta.Tests"
 
 before_script:
   - "cd src"
   - "dotnet restore"
 
 build:
-    stage: build
-    script:
-      - "dotnet restore"
-      - "dotnet build"
+  stage: build
+  script:
+    - "dotnet build"
 
 test:
-    stage: test
-    script: 
-      - "cd $test"
-      - "dotnet test"
+  stage: test
+  script: 
+    - "cd $test"
+    - "dotnet test"
