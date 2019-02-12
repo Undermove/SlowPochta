@@ -27,10 +27,12 @@ variables:
 
 test:
   stage: test
-  image: postgres
   script: 
-    # official way to provide password to psql: http://www.postgresql.org/docs/9.3/static/libpq-envars.html
-    - export PGPASSWORD=$POSTGRES_PASSWORD
-    - psql -h "postgres" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT 'OK' AS status;"
+    - sudo apt-get install -y postgresql postgresql-client libpq-dev
+    - sudo -u postgres psql -d template1
+    - template1=# CREATE USER "$POSTGRES_USER" WITH PASSWORD '$POSTGRES_PASSWORD' CREATEDB;
+    - template1=# CREATE DATABASE "POSTGRES_DB" OWNER "$POSTGRES_USER";
+    - template1=# \q
+    - psql -U "POSTGRES_USER" -h localhost -d "POSTGRES_DB" -W
     - "cd $test"
     - "dotnet test"
