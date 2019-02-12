@@ -25,7 +25,6 @@ namespace SlowPochta.Api
 				.Build();
 
 			return WebHost.CreateDefaultBuilder(args)
-				.UseKestrel()
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.UseConfiguration(config)
 				.UseKestrel()

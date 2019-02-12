@@ -1,6 +1,6 @@
 ﻿using WebSocketSharp.Server;
 
-namespace SlowPochta.Business.Module.Modules
+namespace SlowPochta.Business.Module.WebSocket
 {
 	public interface IWebSocketBehaviorContainer
 	{

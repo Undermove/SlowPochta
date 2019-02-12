@@ -6,8 +6,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SlowPochta.Business.Module.Modules;
 using SlowPochta.Business.Module.Services;
+using SlowPochta.Business.Module.WebSocket;
 using SlowPochta.Core;
-using SlowPochta.Data.Model;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 

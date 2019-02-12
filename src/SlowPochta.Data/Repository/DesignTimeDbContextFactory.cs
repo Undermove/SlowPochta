@@ -20,7 +20,10 @@ namespace SlowPochta.Data.Repository
 
 			builder.UseNpgsql(connectionString);
 
-			return new DataContext(builder.Options);
+			var dataContext = new DataContext(builder.Options);
+			dataContext.Database.Migrate();
+
+			return dataContext;
 		}
 	}
 }

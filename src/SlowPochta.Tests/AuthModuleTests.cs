@@ -1,8 +1,6 @@
 using System;
-using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using SlowPochta.Business.Module;
 using SlowPochta.Business.Module.Configuration;
 using SlowPochta.Business.Module.DataContracts;
 using SlowPochta.Business.Module.Modules;
