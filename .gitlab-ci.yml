@@ -27,7 +27,8 @@ variables:
 
 test:
   stage: test
-  script: 
+  script:
+    - apt-get update 
     - apt-get install -y postgresql postgresql-client libpq-dev
     - -u postgres psql -d template1
     - template1=# CREATE USER "$POSTGRES_USER" WITH PASSWORD '$POSTGRES_PASSWORD' CREATEDB;
