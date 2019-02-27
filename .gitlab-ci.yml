@@ -28,7 +28,7 @@ services:
 test:
   stage: test
   script:
-    - sudo service postgresql start
+    - service postgresql start
     - psql 
     - -U "POSTGRES_USER" -h postgres -d "POSTGRES_DB" -W
     - "cd $test"
