@@ -18,18 +18,14 @@ build:
 
 variables:
   # Configure postgres service (https://hub.docker.com/_/postgres/)
-  POSTGRES_DB: test
-  POSTGRES_USER: postgres
+  POSTGRES_DB: nice_marmot
+  POSTGRES_USER: runner
   POSTGRES_PASSWORD: test
 
 test:
   stage: test
   services:
   - postgres:9.6
-  Host: postgres
-  User: runner
-  Password: $POSTGRES_PASSWORD
-  Database: nice_marmot
   script:
     - service postgresql start
     - psql 
