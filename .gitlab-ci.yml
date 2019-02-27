@@ -1,7 +1,7 @@
 image: microsoft/dotnet:latest
 
 stages:
-  - build
+  #- build
   - test
 
 variables:
@@ -22,11 +22,14 @@ variables:
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: test
 
-services:
-  - postgres:9.6
-
 test:
   stage: test
+  services:
+  - postgres:9.6
+  Host: postgres
+  User: runner
+  Password: $POSTGRES_PASSWORD
+  Database: nice_marmot
   script:
     - service postgresql start
     - psql 
