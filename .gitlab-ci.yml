@@ -22,6 +22,9 @@ variables:
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: test
 
+services:
+  - postgres:9.6
+
 test:
   stage: test
   script:
