@@ -7,9 +7,9 @@ stages:
 variables:
   test: "SlowPochta.Tests"
 
-before_script:
-  - "cd src"
-  - "dotnet restore"
+# before_script:
+  # - "cd src"
+  # - "dotnet restore"
 
 # build:
 #   stage: build
@@ -27,7 +27,6 @@ test:
   services:
   - postgres:9.6
   script:
-    - service postgresql start
     - psql 
     - -U "POSTGRES_USER" -h postgres -d "POSTGRES_DB" -W
     - "cd $test"
