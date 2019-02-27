@@ -27,5 +27,5 @@ test:
   services:
   - postgres:9.6
   script:
-    - cd $test
+    - "cd SlowPochta.Tests"
     - "dotnet test"
