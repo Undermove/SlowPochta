@@ -1,6 +1,4 @@
 image: microsoft/dotnet:latest
-services:
-  - postgres
 
 stages:
   - build
@@ -10,13 +8,12 @@ variables:
   test: "SlowPochta.Tests"
 
 before_script:
-
+  - "cd src"
+  - "dotnet restore"
 
 build:
   stage: build
   script:
-    - "cd src"
-    - "dotnet restore"
     - "dotnet build"
 
 variables:
@@ -27,10 +24,10 @@ variables:
 
 test:
   stage: test
-  image: postgres
   script:
-  # official way to provide password to psql: http://www.postgresql.org/docs/9.3/static/libpq-envars.html
-    - export PGPASSWORD=$POSTGRES_PASSWORD
-    - psql -h "postgres" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT 'OK' AS status;"
+    - apt-get update 
+    - apt-get install -y postgresql-server postgresql-client libpq-dev
+    - psql 
+    - -U "POSTGRES_USER" -h localhost -d "POSTGRES_DB" -W
     - "cd $test"
     - "dotnet test"
