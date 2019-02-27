@@ -10,12 +10,13 @@ variables:
   test: "SlowPochta.Tests"
 
 before_script:
-  - "cd src"
-  - "dotnet restore"
+
 
 build:
   stage: build
   script:
+    - "cd src"
+    - "dotnet restore"
     - "dotnet build"
 
 variables:
