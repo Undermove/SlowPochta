@@ -26,11 +26,8 @@ test:
   stage: test
   script:
     - apt-get update 
-    - apt-get install -y postgresql postgresql-client libpq-dev
-    - psql -d template1
-    - template1=# CREATE USER "$POSTGRES_USER" WITH PASSWORD '$POSTGRES_PASSWORD' CREATEDB;
-    - template1=# CREATE DATABASE "POSTGRES_DB" OWNER "$POSTGRES_USER";
-    - template1=# \q
-    - psql -U "POSTGRES_USER" -h localhost -d "POSTGRES_DB" -W
+    - apt-get install -y postgresql-server postgresql-client libpq-dev
+    - psql 
+    - -U "POSTGRES_USER" -h localhost -d "POSTGRES_DB" -W
     - "cd $test"
     - "dotnet test"
