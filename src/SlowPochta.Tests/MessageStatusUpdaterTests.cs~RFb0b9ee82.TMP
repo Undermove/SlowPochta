@@ -44,7 +44,7 @@ namespace SlowPochta.Tests
             _dataContext.Dispose();
         }
 
-        [Fact(Skip = "For sometimes")]
+        [Fact]
         public void MessageStatusDescriptionUpdatingTest()
         {
             //arrange
@@ -54,10 +54,11 @@ namespace SlowPochta.Tests
 				Status = DeliveryStatus.Created,
 				StatusDescription = ""
             });
+            _dataContext.SaveChanges();                                     
 	        _dataContext.MessageDeliveryStatusVariants.Add(
 		        new MessageDeliveryStatusVariant()
 		        {
-			        DeliveryStatusHeader = "Some Delivery status",
+			        DeliveryStatusDescription = "Some Delivery status"
 		        });
             _dataContext.SaveChanges();                                     
 
@@ -69,9 +70,8 @@ namespace SlowPochta.Tests
             Thread.Sleep(2000);
             _dataContext.SaveChanges();
 
-
-			//assert
-			var msg = _dataContext.Messages.Find((long)1);
+            //assert
+            var msg = _dataContext.Messages.FirstOrDefault(message => testMessage.Entity.Id == message.Id);
             Assert.False(string.IsNullOrEmpty(msg.StatusDescription));
             var deliveryStatus = _dataContext.MessagePassedDeliveryStatuses.Find(1);
             Assert.NotNull(deliveryStatus);

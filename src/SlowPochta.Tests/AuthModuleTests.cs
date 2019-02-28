@@ -1,5 +1,8 @@
 using System;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Moq;
 using SlowPochta.Business.Module.Configuration;
 using SlowPochta.Business.Module.DataContracts;
@@ -22,7 +25,12 @@ namespace SlowPochta.Tests
 			var contextFactory = new DesignTimeDbContextFactory();
 			_dataContext = contextFactory.CreateDbContext(new string[]{});
 			_dataContext.Database.Migrate();
-			_authOptionsMock = new Mock<AuthOptionsConfig>(); 
+			Mock<IConfigurationRoot> configMock = new Mock<IConfigurationRoot>();
+			configMock.Setup(root => root[It.IsAny<string>()]).Returns("100");
+			_authOptionsMock = new Mock<AuthOptionsConfig>(configMock.Object);
+			_authOptionsMock.Setup(config => config.SymmetricSecurityKey).Returns(() => 
+				new SymmetricSecurityKey(Encoding.UTF8.GetBytes("sometestkeyfortests")));
+			_authOptionsMock.Setup(config => config.LifetimeMinutes).Returns(() => 100);
 			_authModule = new AuthModule(contextFactory, _authOptionsMock.Object);
 		}
 
