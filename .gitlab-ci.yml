@@ -3,6 +3,7 @@ image: microsoft/dotnet:latest
 stages:
   - build
   - test
+  - deploy
 
 variables:
   test: "SlowPochta.Tests"
@@ -14,7 +15,10 @@ before_script:
 build:
   stage: build
   script:
-    - "dotnet build"
+    - "dotnet build -o $CI_PROJECT_DIR/build/"
+    artifacts:
+    paths:
+      - $CI_PROJECT_DIR/build/
 
 variables:
   # Configure postgres service (https://hub.docker.com/_/postgres/)
@@ -29,3 +33,32 @@ test:
   script:
     - "cd SlowPochta.Tests"
     - "dotnet test"
+
+deploy:
+  stage: deploy
+  script:
+  - apt-get update -qq && apt-get install -y -qq sshpass
+  # Настраиваем SSH
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+  # Создаем папку для репозитория  
+  - mkdir -p /go/src/gitlab.com/$GROUP_NAME
+  # Клонируем в неё репозиторий
+  - git clone git@gitlab.com:$GROUP_NAME/$REPOSITORY_NAME.git /go/src/gitlab.com/$GROUP_NAME/$REPOSITORY_NAME
+  # Создаем папку под готовый билд
+  - mkdir -p $CI_PROJECT_DIR/build/
+  # Переходим в папку с билдом () там лежит бинарник и папка public
+  - cd $CI_PROJECT_DIR/build
+  # Используем утилиту sshpass для удаленного выполнения команд на VDS     
+  - sshpass -V
+  - export SSHPASS=$USER_PASS 
+  # Останавливаем сервис
+  - sshpass -e ssh -o stricthostkeychecking=no $USER@$HOST systemctl stop $SERVICE_NAME
+  # Копируем новые файлы
+  - sshpass -e scp -o stricthostkeychecking=no -r . $USER@$HOST:$TARGET_DIR_ON_HOST
+  # Перезапускаем сервис
+  - sshpass -e ssh -o stricthostkeychecking=no $USER@$HOST systemctl restart $SERVICE_NAME
