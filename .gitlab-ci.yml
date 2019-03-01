@@ -15,7 +15,7 @@ before_script:
 build:
   stage: build
   script:
-    - "dotnet build -o $CI_PROJECT_DIR/build/"
+    - "dotnet build"
     artifacts:
     paths:
       - $CI_PROJECT_DIR/build/
