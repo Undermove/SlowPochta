@@ -15,10 +15,11 @@ before_script:
 build:
   stage: build
   script:
-    - "dotnet build"
-    artifacts:
+    - dotnet build -o $CI_PROJECT_DIR/build/
+  artifacts:
     paths:
-      - $CI_PROJECT_DIR/build/
+      - $CI_PROJECT_DIR/build/main
+
 
 variables:
   # Configure postgres service (https://hub.docker.com/_/postgres/)
