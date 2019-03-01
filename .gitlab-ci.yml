@@ -17,8 +17,8 @@ build:
   script:
     - dotnet build -o $CI_PROJECT_DIR/build/
   artifacts:
-  paths:
-    - $CI_PROJECT_DIR/build/
+    paths:
+      - $CI_PROJECT_DIR/build/main
 
 
 variables:
