@@ -61,7 +61,7 @@ deploy:
   - sed -i -e 's|###KEY###|'"$KEY"'|' ./appsettings.json
   - sed -i -e 's|###LIFETIME_MINUTES###|'"$LIFETIME_MINUTES"'|' ./appsettings.json
   - sed -i -e 's|###WEB_SOCKET_URL###|'"$WEB_SOCKET_URL"'|' ./appsettings.json
-  - sed -i -e 's|###LOG_LEVEL###|'"$LOG_LEVEL"'|' ./appsettings.json
+  - sed -i -e 's|###APP_LOG_LEVEL###|'"$APP_LOG_LEVEL"'|' ./appsettings.json
   - sed -i -e 's|###UPDATE_INTERVAL_SECONDS###|'"$UPDATE_INTERVAL_SECONDS"'|' ./appsettings.json
   # Используем утилиту sshpass для удаленного выполнения команд на VDS     
   - sshpass -V
