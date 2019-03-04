@@ -55,6 +55,8 @@ deploy:
   - mkdir -p $CI_PROJECT_DIR/build/
   # Переходим в папку с билдом () там лежит бинарник и папка public
   - cd $CI_PROJECT_DIR/build
+  # настраиваем переменные для проекта
+  - sed -i -e 's|###DEFAULT_CONNECTION###|'"$DEFAULT_CONNECTION"'|' ./appsettings.json
   # Используем утилиту sshpass для удаленного выполнения команд на VDS     
   - sshpass -V
   - export SSHPASS=$USER_PASS 
