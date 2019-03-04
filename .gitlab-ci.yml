@@ -16,7 +16,7 @@ build:
   stage: build
   script:
     - dotnet build
-    - dotnet publish SlowPochta.Api.csproj -c Release -f netcoreapp2.2 --self-contained -r linux-x64 -o $CI_PROJECT_DIR/build/
+    - dotnet publish /builds/Undermove/slowpochta/src/SlowPochta.Api/SlowPochta.Api.csproj -c Release -f netcoreapp2.2 --self-contained -r linux-x64 -o $CI_PROJECT_DIR/build/
   artifacts:
     paths:
       - $CI_PROJECT_DIR/build/
