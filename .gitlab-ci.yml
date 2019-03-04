@@ -18,7 +18,7 @@ build:
     - dotnet build -o $CI_PROJECT_DIR/build/
   artifacts:
     paths:
-      - $CI_PROJECT_DIR/build/main
+      - $CI_PROJECT_DIR/build/
 
 
 variables:
@@ -54,6 +54,7 @@ deploy:
   - mkdir -p $CI_PROJECT_DIR/build/
   # Переходим в папку с билдом () там лежит бинарник и папка public
   - cd $CI_PROJECT_DIR/build
+  - ls
   # Используем утилиту sshpass для удаленного выполнения команд на VDS     
   - sshpass -V
   - export SSHPASS=$USER_PASS 
