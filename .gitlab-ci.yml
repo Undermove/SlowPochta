@@ -37,6 +37,8 @@ test:
 
 deploy:
   stage: deploy
+  only:
+    - tags
   script:
   - apt-get update -qq && apt-get install -y -qq sshpass
   # Настраиваем SSH
