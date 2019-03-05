@@ -81,31 +81,12 @@ namespace SlowPochta.Business.Module.Services
                 .WithIdentity(id, "group")
                 .WithSimpleSchedule(builder =>
                     builder.WithIntervalInSeconds(_config.UpdateIntervalSeconds).RepeatForever())
+                .StartNow()
                 .Build();
 
             _scheduler.ScheduleJob(job, trigger);
             Logger.LogInformation($"Job for {message.Id} has been succesfully created");
         }
-
-	    public async Task InvokeMessageDelivered(long messageId)
-	    {
-		    Func<object, MessageDeliveredEventArgs, Task> handler = MessageDelivered;
-
-		    if (handler == null)
-		    {
-			    return;
-		    }
-
-		    Delegate[] invocationList = handler.GetInvocationList();
-		    Task[] handlerTasks = new Task[invocationList.Length];
-
-		    for (int i = 0; i < invocationList.Length; i++)
-		    {
-			    handlerTasks[i] = ((Func<object, EventArgs, Task>)invocationList[i])(this, new MessageDeliveredEventArgs{MessageId = messageId});
-		    }
-
-		    await Task.WhenAll(handlerTasks);
-	    }
 
 		public class ChangeMessageDeliveryStatusJob : IJob
         {
@@ -151,7 +132,7 @@ namespace SlowPochta.Business.Module.Services
 
 	            message.LastUpdateTime = DateTime.UtcNow;
 				dataContext.Messages.Update(message);
-	            await dataContext.SaveChangesAsync();
+	            dataContext.SaveChanges();
 			}
 
 	        private (int, string) GetRandomStatus(DataContext dContext)
@@ -161,7 +142,7 @@ namespace SlowPochta.Business.Module.Services
                     .ToList();
 
                 Random rnd = new Random();
-                int randomNum = rnd.Next(1, randomDescriptions.Count);
+                int randomNum = rnd.Next(0, randomDescriptions.Count + 1);
                 return (randomNum, randomDescriptions[randomNum]);
             }
         }

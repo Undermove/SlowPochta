@@ -1,0 +1,76 @@
+image: microsoft/dotnet:latest
+
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  test: "SlowPochta.Tests"
+
+before_script:
+  - "cd src"
+  - "dotnet restore"
+
+build:
+  stage: build
+  script:
+    - dotnet publish /builds/Undermove/slowpochta/src/SlowPochta.Api/SlowPochta.Api.csproj -c Release -f netcoreapp2.2 --self-contained -r linux-x64 -o $CI_PROJECT_DIR/build/
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/build/
+
+
+variables:
+  # Configure postgres service (https://hub.docker.com/_/postgres/)
+  POSTGRES_DB: nice_marmot
+  POSTGRES_USER: runner
+  POSTGRES_PASSWORD: test
+
+test:
+  stage: test
+  services:
+  - postgres:9.6
+  script:
+    - "cd SlowPochta.Tests"
+    - "dotnet test"
+
+deploy:
+  stage: deploy
+  only:
+    - tags
+  script:
+  - apt-get update -qq && apt-get install -y -qq sshpass
+  # Настраиваем SSH
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+  # Создаем папку для репозитория  
+  - mkdir -p /go/src/gitlab.com/$GROUP_NAME
+  # Клонируем в неё репозиторий
+  - git clone git@gitlab.com:$GROUP_NAME/$REPOSITORY_NAME.git /go/src/gitlab.com/$GROUP_NAME/$REPOSITORY_NAME
+  # Создаем папку под готовый билд
+  - mkdir -p $CI_PROJECT_DIR/build/
+  # Переходим в папку с билдом () там лежит бинарник и папка public
+  - cd $CI_PROJECT_DIR/build
+  # настраиваем переменные для проекта
+  - sed -i -e 's|###DEFAULT_CONNECTION###|'"$DEFAULT_CONNECTION"'|' ./appsettings.json
+  - sed -i -e 's|###ISSUER###|'"$ISSUER"'|' ./appsettings.json
+  - sed -i -e 's|###AUDIENCE###|'"$AUDIENCE"'|' ./appsettings.json
+  - sed -i -e 's|###KEY###|'"$KEY"'|' ./appsettings.json
+  - sed -i -e 's|###LIFETIME_MINUTES###|'"$LIFETIME_MINUTES"'|' ./appsettings.json
+  - sed -i -e 's|###WEB_SOCKET_URL###|'"$WEB_SOCKET_URL"'|' ./appsettings.json
+  - sed -i -e 's|###APP_LOG_LEVEL###|'"$APP_LOG_LEVEL"'|' ./appsettings.json
+  - sed -i -e 's|###UPDATE_INTERVAL_SECONDS###|'"$UPDATE_INTERVAL_SECONDS"'|' ./appsettings.json
+  # Используем утилиту sshpass для удаленного выполнения команд на VDS     
+  - sshpass -V
+  - export SSHPASS=$USER_PASS 
+  # Останавливаем сервис
+  - sshpass -e ssh -o stricthostkeychecking=no $USER@$HOST systemctl stop $SERVICE_NAME
+  # Копируем новые файлы
+  - sshpass -e scp -o stricthostkeychecking=no -r . $USER@$HOST:$TARGET_DIR_ON_HOST
+  # Перезапускаем сервис
+  - sshpass -e ssh -o stricthostkeychecking=no $USER@$HOST systemctl restart $SERVICE_NAME
