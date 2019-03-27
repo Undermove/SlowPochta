@@ -4,6 +4,7 @@
 	{
 		Created,
 		InProgress,
-		Delivered
+		Delivered,
+		Lost
 	}
 }

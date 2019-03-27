@@ -23,6 +23,7 @@ namespace SlowPochta.Business.Module.Services
         private readonly MessageStatusUpdaterConfig _config;
 
 	    private const string FinalStatusDescription = "Доставлено";
+        private const string LostStatusDescription = "Не дошло";
 
         public MessageStatusUpdater(DesignTimeDbContextFactory context, MessageModule messageModule,
             MessageStatusUpdaterConfig config)
@@ -104,6 +105,7 @@ namespace SlowPochta.Business.Module.Services
                 switch (message.Status)
                 {
 	                case DeliveryStatus.Delivered:
+	                case DeliveryStatus.Lost:
 		                await scheduler.DeleteJob(new JobKey(jobId));
 		                return;
 	                case DeliveryStatus.Created:
@@ -119,6 +121,13 @@ namespace SlowPochta.Business.Module.Services
 				if (message.StatusDescription == FinalStatusDescription)
                 {
                     message.Status = DeliveryStatus.Delivered;
+					await scheduler.DeleteJob(new JobKey(jobId));
+	                await messageStatusUpdater.MessageDelivered.InvokeEventAsync(new MessageDeliveredEventArgs(){MessageId = message.Id});
+				}
+
+                if (message.StatusDescription == LostStatusDescription)
+                {
+                    message.Status = DeliveryStatus.Lost;
 					await scheduler.DeleteJob(new JobKey(jobId));
 	                await messageStatusUpdater.MessageDelivered.InvokeEventAsync(new MessageDeliveredEventArgs(){MessageId = message.Id});
 				}
