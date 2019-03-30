@@ -127,9 +127,18 @@ namespace SlowPochta.Business.Module.Services
 
                 if (message.StatusDescription == LostStatusDescription)
                 {
-                    message.Status = DeliveryStatus.Lost;
-					await scheduler.DeleteJob(new JobKey(jobId));
-	                await messageStatusUpdater.MessageDelivered.InvokeEventAsync(new MessageDeliveredEventArgs(){MessageId = message.Id});
+                    Random rnd = new Random();
+                    // просто чтобы понизить вероятность выпадения статуса не доставлено
+                    if(rnd.Next(0,5) == 3)
+                    {
+                        message.Status = DeliveryStatus.Lost;
+                        await scheduler.DeleteJob(new JobKey(jobId));
+                        await messageStatusUpdater.MessageDelivered.InvokeEventAsync(new MessageDeliveredEventArgs(){MessageId = message.Id});
+                    }
+                    else
+                    {
+                        return;
+                    }
 				}
 
 	            await dataContext.MessagePassedDeliveryStatuses.AddAsync(new MessagePassedDeliveryStatus()
